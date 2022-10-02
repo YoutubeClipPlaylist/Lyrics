@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Lyrics.Models;
 
+[JsonConverter(typeof(LyricConverter))]
 public interface ILyric
 {
     int LyricId { get; set; }
