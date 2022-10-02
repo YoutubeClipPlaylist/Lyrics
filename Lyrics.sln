@@ -5,6 +5,11 @@ VisualStudioVersion = 17.3.32804.467
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyrics", "Lyrics.csproj", "{B21BA21C-D271-4B1F-834D-6B27A9CA5B67}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "方案項目", "方案項目", "{56AB806F-D7F0-44C2-9F96-DC2CFAFFE936}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\FetchLyrics.yml = .github\workflows\FetchLyrics.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
