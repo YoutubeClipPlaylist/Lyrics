@@ -74,7 +74,7 @@ static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
 
         Console.WriteLine($"Reading {path}...");
 
-        FileStream fs2 = File.OpenRead("{path}");
+        FileStream fs2 = File.OpenRead(path);
         List<ILyric> temp2 = JsonSerializer.Deserialize<List<ILyric>>(
             fs2,
             new JsonSerializerOptions
