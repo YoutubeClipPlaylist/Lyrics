@@ -1,0 +1,30 @@
+name: Lyric mismatch
+description: Lyrics and songs don't match、歌詞和歌曲不匹配、歌詞と曲が一致しない
+title: "[Lyric mismatch]"
+labels: ["Lyric mismatch"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Lyrics and songs don't match
+        > This issue template is for lyrics and songs that do not match.
+        > If it is a timestamp shift, please fill out another template.
+  - type: input
+    id: share
+    attributes:
+      label: Share link
+      description: Please post the share link you got from the song in question. You can get it at the bottom of the playlist UI.
+      placeholder: ex. https://www.youtube.com/watch?v=eYP8h2z0qN8&t=461&end=738&share=1
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: More details
+      description: If it is convenient, please give us more details. Can you provide the correct lyrics or links? 
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: "Thanks for completing our form!"
+

@@ -1,0 +1,29 @@
+name: Lyric timestamp shift
+description: The timestamp of the lyrics is shifted、歌詞的時間偏移、歌詞のタイムスタンプがずれる
+title: "[Lyric time shifted]"
+labels: ["Lyric time shifted"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## The timestamp of the lyrics is shifted
+        > This issue template is for timestamp of the lyrics is shifted.
+        > If it is a mismatch between lyrics and songs, please fill out another template.
+  - type: input
+    id: share
+    attributes:
+      label: Share link
+      description: Please post the share link you got from the song in question. You can get it at the bottom of the playlist UI.
+      placeholder: ex. https://www.youtube.com/watch?v=eYP8h2z0qN8&t=461&end=738&share=1
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: More details
+      description: If it is convenient, please give us more details. Is it too fast? Too slow? Offset by about a few seconds?
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: "Thanks for completing our form!"
