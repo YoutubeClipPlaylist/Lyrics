@@ -3,6 +3,9 @@ using NeteaseCloudMusicApi;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+
+const int maxCount = 2000;
+
 {
     List<ISong> songs = new();
     List<ILyric> lyrics = new();
@@ -16,13 +19,30 @@ using System.Text.RegularExpressions;
     File.Create("Lyrics/0.lrc").Close();
 #endif
 
-    ReadJsonFiles(songs, lyrics);
+    try
+    {
+        ReadJsonFiles(songs, lyrics);
 
-    List<ISong> diffList = FilterNewSongs(songs, lyrics);
+        List<ISong> diffList = FilterNewSongs(songs, lyrics);
 
-    await ProcessNewSongs(lyrics, diffList);
+        if (diffList.Count > maxCount)
+        {
+            Console.WriteLine($"Too many songs to process. Max: {maxCount}, Actual: {diffList.Count}");
+            Console.WriteLine("Please execute this program again later.");
+            diffList = diffList.Take(maxCount).ToList();
+        }
 
-    Environment.Exit(0);
+        await ProcessNewSongs(lyrics, diffList);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine("Unhandled exception: " + e.Message);
+        Environment.Exit(-1);
+    }
+    finally
+    {
+        Environment.Exit(0);
+    }
 
     void ProcessExit(object? sender, EventArgs e)
     {
@@ -109,6 +129,8 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
 {
     CloudMusicApi api = new();
     Random random = new();
+    int count = 0;
+
     foreach (var song in diffList)
     {
         try
@@ -133,11 +155,11 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
             if (!File.Exists($"Lyrics/{songId}.lrc"))
             {
                 // Download lyric by id at Netease Cloud Music.
-                await Task.Delay(TimeSpan.FromMilliseconds(random.Next(500,1500)));
+                await Task.Delay(TimeSpan.FromMilliseconds(random.Next(500, 1500)));
 
                 string? lyricString = await GetLyricAsync(api, songId);
 
-                if(!string.IsNullOrEmpty(lyricString))
+                if (!string.IsNullOrEmpty(lyricString))
                     File.WriteAllText($"Lyrics/{songId}.lrc", lyricString, System.Text.Encoding.UTF8);
             }
 
@@ -149,7 +171,7 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
                 Title = Regex.Unescape(songName)
             });
 
-            Console.WriteLine($"Get lyric: {song.VideoId}, {song.StartTime}, {songId}, {songName}");
+            Console.WriteLine($"Get lyric {count++}/{diffList.Count}: {song.VideoId}, {song.StartTime}, {songId}, {songName}");
         }
         catch (Newtonsoft.Json.JsonException e)
         {
