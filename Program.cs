@@ -7,8 +7,14 @@ using System.Text.RegularExpressions;
     List<ISong> songs = new();
     List<ILyric> lyrics = new();
 
+    AppDomain.CurrentDomain.ProcessExit += ProcessExit;
+    Console.CancelKeyPress += ProcessExit;
+
+#if DEBUG
     Directory.CreateDirectory("Lyrics");
+    Directory.CreateDirectory("Playlists");
     File.Create("Lyrics/0.lrc").Close();
+#endif
 
     ReadJsonFiles(songs, lyrics);
 
@@ -16,7 +22,14 @@ using System.Text.RegularExpressions;
 
     await ProcessNewSongs(lyrics, diffList);
 
-    File.WriteAllText("Lyrics.json", JsonSerializer.Serialize(lyrics.ToArray()));
+    Environment.Exit(0);
+
+    void ProcessExit(object? sender, EventArgs e)
+    {
+        Console.WriteLine("Writing Lyrics.json...");
+        File.WriteAllText("Lyrics.json", JsonSerializer.Serialize(lyrics.ToArray()));
+        Console.WriteLine("Gracefully exit.");
+    }
 }
 
 static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
@@ -29,13 +42,11 @@ static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
     catch (JsonException)
     {
         Console.WriteLine("Failed to read the file.");
-        Console.WriteLine("Lyrics.json");
         Environment.Exit(13);   // ERROR_INVALID_DATA
     }
     catch (NotSupportedException)
     {
         Console.WriteLine("Failed to read the file.");
-        Console.WriteLine("Lyrics.json");
         Environment.Exit(13);   // ERROR_INVALID_DATA
     }
 
@@ -74,7 +85,7 @@ static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
 
         Console.WriteLine($"Reading {path}...");
 
-        FileStream fs2 = File.OpenRead(path);
+        using FileStream fs2 = File.OpenRead(path);
         List<ILyric> temp2 = JsonSerializer.Deserialize<List<ILyric>>(
             fs2,
             new JsonSerializerOptions
