@@ -102,21 +102,31 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
     {
         try
         {
-            (int songId, string songName) = await GetSongIdAsync(api, song);
-            if (songId == 0)
-            {
-                continue;
-            }
+            int songId = default;
+            string songName = string.Empty;
 
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            // Find lyric id at local.
+            ILyric? existLyric = lyrics.Find(p => p.Title == song.Title);
+            if (null != existLyric)
+                (songId, songName) = (existLyric.LyricId, existLyric.Title);
 
-            ILyric? existLyric = lyrics.Find(p => p.LyricId == songId);
+            // Find lyric id at Netease Cloud Music.
             if (null == existLyric)
+                (songId, songName) = await GetSongIdAsync(api, song);
+
+            // Can't find lyrics from internet.
+            if (default == songId)
+                continue;
+
+            // Find local .lrc file.
+            if (!File.Exists($"Lyrics/{songId}.lrc"))
             {
+                // Download lyric by id at Netease Cloud Music.
+                await Task.Delay(TimeSpan.FromMilliseconds(random.Next(500,1500)));
+
                 string? lyricString = await GetLyricAsync(api, songId);
 
-                if (!string.IsNullOrEmpty(lyricString))
-                    File.WriteAllText($"Lyrics/{songId}.lrc", lyricString, System.Text.Encoding.UTF8);
+                File.WriteAllText($"Lyrics/{songId}.lrc", lyricString ?? "", System.Text.Encoding.UTF8);
             }
 
             lyrics.Add(new Lyric()
@@ -133,7 +143,7 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
         {
             Console.Error.WriteLine(e);
         }
-        await Task.Delay(TimeSpan.FromMilliseconds(random.Next(1000, 3000)));
+        await Task.Delay(TimeSpan.FromMilliseconds(random.Next(500, 3000)));
     }
 }
 
