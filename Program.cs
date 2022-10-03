@@ -3,10 +3,11 @@ using NeteaseCloudMusicApi;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-
-const int maxCount = 2000;
-
 {
+    if (!int.TryParse(Environment.GetEnvironmentVariable("MAXCOUNT"), out int maxCount))
+    {
+        maxCount = 2000;
+    }
     List<ISong> songs = new();
     List<ILyric> lyrics = new();
 
@@ -129,10 +130,10 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
 {
     CloudMusicApi api = new();
     Random random = new();
-    int count = 0;
 
-    foreach (var song in diffList)
+    for (int i = 0; i < diffList.Count; i++)
     {
+        ISong? song = diffList[i];
         try
         {
             int songId = default;
@@ -149,7 +150,10 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
 
             // Can't find lyrics from internet.
             if (default == songId)
+            {
+                Console.Error.WriteLine($"Can't find lyric {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}, 0, {songName}");
                 continue;
+            }
 
             // Find local .lrc file.
             if (!File.Exists($"Lyrics/{songId}.lrc"))
@@ -171,13 +175,16 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
                 Title = Regex.Unescape(songName)
             });
 
-            Console.WriteLine($"Get lyric {count++}/{diffList.Count}: {song.VideoId}, {song.StartTime}, {songId}, {songName}");
+            Console.WriteLine($"Get lyric {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}, {songId}, {songName}");
         }
         catch (Newtonsoft.Json.JsonException e)
         {
             Console.Error.WriteLine(e);
         }
-        await Task.Delay(TimeSpan.FromMilliseconds(random.Next(500, 3000)));
+        finally
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(random.Next(500, 3000)));
+        }
     }
 }
 
