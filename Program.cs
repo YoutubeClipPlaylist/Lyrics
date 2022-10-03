@@ -196,10 +196,13 @@ static async Task<(int songId, string songName)> GetSongIdAsync(CloudMusicApi ap
     }
 
     json = (JObject)json["result"];
-    if (json["songs"] is not JArray result)
+    if (null == json
+        || json["songs"] is not IEnumerable<JToken> result
+        || !result.Any())
     {
         return default;
     }
+
     return result.Select(t => ((int)t["id"], (string)t["name"])).FirstOrDefault();
 }
 
