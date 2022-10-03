@@ -126,7 +126,8 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
 
                 string? lyricString = await GetLyricAsync(api, songId);
 
-                File.WriteAllText($"Lyrics/{songId}.lrc", lyricString ?? "", System.Text.Encoding.UTF8);
+                if(!string.IsNullOrEmpty(lyricString))
+                    File.WriteAllText($"Lyrics/{songId}.lrc", lyricString, System.Text.Encoding.UTF8);
             }
 
             lyrics.Add(new Lyric()
