@@ -135,7 +135,7 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
         ISong? song = diffList[i];
         try
         {
-            int songId = default;
+            int songId = 0;
             string songName = string.Empty;
 
             // Find lyric id at local.
@@ -150,7 +150,7 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
             // Can't find lyrics from internet.
             if (default == songId)
             {
-                Console.Error.WriteLine($"Can't find lyric {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}, 0, {songName}");
+                Console.Error.WriteLine($"Can't find song. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
                 continue;
             }
 
@@ -162,8 +162,20 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
 
                 string? lyricString = await GetLyricAsync(api, songId);
 
-                if (!string.IsNullOrEmpty(lyricString))
-                    File.WriteAllText($"Lyrics/{songId}.lrc", lyricString, System.Text.Encoding.UTF8);
+                if (string.IsNullOrEmpty(lyricString))
+                {
+                    Console.Error.WriteLine($"Can't find lyric. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}, {songId}, {songName}");
+                    continue;
+                }
+
+                if (lyricString.Contains("纯音乐，请欣赏")
+                    || !Regex.IsMatch(lyricString, @"\[\d{2}:\d{2}.\d{2,5}\]"))
+                {
+                    Console.Error.WriteLine($"Found a invalid lyric. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}, {songId}, {songName}");
+                    continue;
+                }
+
+                File.WriteAllText($"Lyrics/{songId}.lrc", lyricString, System.Text.Encoding.UTF8);
             }
 
             lyrics.Add(new Lyric()
