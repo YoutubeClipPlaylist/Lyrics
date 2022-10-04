@@ -1,64 +1,77 @@
 ﻿using Lyrics.Models;
 using NeteaseCloudMusicApi;
 using Newtonsoft.Json.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-{
-    if (!int.TryParse(Environment.GetEnvironmentVariable("MAXCOUNT"), out int maxCount))
-    {
-        maxCount = 2000;
-    }
-    List<ISong> songs = new();
-    List<ILyric> lyrics = new();
+using System.Text.Unicode;
 
-    AppDomain.CurrentDomain.ProcessExit += ProcessExit;
-    Console.CancelKeyPress += ProcessExit;
+if (!int.TryParse(Environment.GetEnvironmentVariable("MAXCOUNT"), out int maxCount))
+{
+    maxCount = 2000;
+}
+List<ISong> songs = new();
+List<ILyric> lyrics = new();
+
+AppDomain.CurrentDomain.ProcessExit += ProcessExit;
+Console.CancelKeyPress += ProcessExit;
 
 #if DEBUG
-    Directory.CreateDirectory("Lyrics");
-    Directory.CreateDirectory("Playlists");
-    File.Create("Lyrics/0.lrc").Close();
+Directory.CreateDirectory("Lyrics");
+Directory.CreateDirectory("Playlists");
+File.Create("Lyrics/0.lrc").Close();
 #endif
 
-    try
+try
+{
+    ReadJsonFiles(songs, lyrics);
+
+    List<ISong> diffList = FilterNewSongs(songs, lyrics);
+
+    if (diffList.Count > maxCount)
     {
-        ReadJsonFiles(songs, lyrics);
+        Console.WriteLine($"Too many songs to process. Max: {maxCount}, Actual: {diffList.Count}");
+        Console.WriteLine("Please execute this program again later.");
+        diffList = diffList.Take(maxCount).ToList();
+    }
 
-        List<ISong> diffList = FilterNewSongs(songs, lyrics);
+    await ProcessNewSongs(lyrics, diffList);
+}
+catch (Exception e)
+{
+    Console.WriteLine("Unhandled exception: " + e.Message);
+    Environment.Exit(-1);
+}
+finally
+{
+    Environment.Exit(0);
+}
 
-        if (diffList.Count > maxCount)
+void ProcessExit(object? sender, EventArgs e)
+{
+    Console.WriteLine("Writing Lyrics.json...");
+    File.WriteAllText("Lyrics.json", JsonSerializer.Serialize(
+        lyrics.ToArray(),
+        options: new()
         {
-            Console.WriteLine($"Too many songs to process. Max: {maxCount}, Actual: {diffList.Count}");
-            Console.WriteLine("Please execute this program again later.");
-            diffList = diffList.Take(maxCount).ToList();
-        }
-
-        await ProcessNewSongs(lyrics, diffList);
-    }
-    catch (Exception e)
-    {
-        Console.WriteLine("Unhandled exception: " + e.Message);
-        Environment.Exit(-1);
-    }
-    finally
-    {
-        Environment.Exit(0);
-    }
-
-    void ProcessExit(object? sender, EventArgs e)
-    {
-        Console.WriteLine("Writing Lyrics.json...");
-        File.WriteAllText("Lyrics.json", JsonSerializer.Serialize(lyrics.ToArray()));
-        Console.WriteLine("Gracefully exit.");
-    }
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            WriteIndented = true,
+        }));
+    Console.WriteLine("Gracefully exit.");
 }
 
 static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
 {
+    JsonSerializerOptions option = new()
+    {
+        ReadCommentHandling = JsonCommentHandling.Skip,
+        AllowTrailingCommas = true
+    };
+
     try
     {
-        ReadPlaylists(songs);
-        ReadLyrics(lyrics);
+        ReadPlaylists();
+        ReadLyrics();
     }
     catch (JsonException)
     {
@@ -71,21 +84,14 @@ static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
         Environment.Exit(13);   // ERROR_INVALID_DATA
     }
 
-    static void ReadPlaylists(List<ISong> songs)
+    void ReadPlaylists()
     {
         string[] jsoncFiles = Directory.GetFiles("Playlists", "*list.jsonc", SearchOption.AllDirectories);
         foreach (var file in jsoncFiles)
         {
             Console.WriteLine($"Reading {file}...");
             using FileStream fs = File.OpenRead(file);
-            List<ISong> temp = JsonSerializer.Deserialize<List<ISong>>(
-                fs,
-                new JsonSerializerOptions
-                {
-                    ReadCommentHandling = JsonCommentHandling.Skip,
-                    AllowTrailingCommas = true
-                }
-            ) ?? new();
+            List<ISong> temp = JsonSerializer.Deserialize<List<ISong>>(fs, option) ?? new();
             Console.WriteLine($"Loaded {temp.Count} songs.");
             songs.AddRange(temp);
         }
@@ -93,7 +99,7 @@ static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
         Console.WriteLine($"Total: Loaded {songs.Count} songs.");
     }
 
-    static void ReadLyrics(List<ILyric> lyrics)
+    void ReadLyrics()
     {
         string path = "Lyrics.json";
         if (!File.Exists(path))
@@ -107,14 +113,7 @@ static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
         Console.WriteLine($"Reading {path}...");
 
         using FileStream fs2 = File.OpenRead(path);
-        List<ILyric> temp2 = JsonSerializer.Deserialize<List<ILyric>>(
-            fs2,
-            new JsonSerializerOptions
-            {
-                ReadCommentHandling = JsonCommentHandling.Skip,
-                AllowTrailingCommas = true
-            }
-        ) ?? new();
+        List<ILyric> temp2 = JsonSerializer.Deserialize<List<ILyric>>(fs2, option) ?? new();
         Console.WriteLine($"Loaded {temp2.Count} lyrics.");
         lyrics.AddRange(temp2);
     }
