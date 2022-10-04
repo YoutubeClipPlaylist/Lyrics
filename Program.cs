@@ -35,7 +35,9 @@ try
         diffList = diffList.Take(maxCount).ToList();
     }
 
-    await ProcessNewSongs(lyrics, diffList);
+    CloudMusicApi api = new();
+    await CheckOldSongs(api, lyrics);
+    await ProcessNewSongs(api, lyrics, diffList);
 }
 catch (Exception e)
 {
@@ -125,9 +127,32 @@ static List<ISong> FilterNewSongs(List<ISong> songs, List<ILyric> lyrics)
     return songs.Where(p => !lyricsHashSet.Contains(p.VideoId + p.StartTime)).ToList();
 }
 
-static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
+async Task CheckOldSongs(CloudMusicApi api, List<ILyric> lyrics)
 {
-    CloudMusicApi api = new();
+    HashSet<string> files = new DirectoryInfo("Lyrics").GetFiles()
+                                                       .Select(p => p.Name)
+                                                       .ToHashSet();
+    Console.WriteLine("Start to check old songs...");
+    foreach (var lyric in lyrics)
+    {
+        if (!files.Contains(lyric.LyricId + ".lrc"))
+        {
+            try
+            {
+                await DownloadLyricAndWriteFileAsync(api, lyric.LyricId);
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine($"Failed to download lyric {lyric.LyricId}: {e.Message}");
+                continue;
+            }
+        }
+    }
+    Console.WriteLine("Finish checking old songs.");
+}
+
+static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<ISong> diffList)
+{
     Random random = new();
 
     for (int i = 0; i < diffList.Count; i++)
