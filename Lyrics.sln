@@ -6,6 +6,14 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lyrics", "Lyrics.csproj", "{B21BA21C-D271-4B1F-834D-6B27A9CA5B67}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "方案項目", "方案項目", "{56AB806F-D7F0-44C2-9F96-DC2CFAFFE936}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{E4C159BB-BECF-4E4E-9DCF-163D90BB5950}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\lyric-mismatch.yml = .github\ISSUE_TEMPLATE\lyric-mismatch.yml
+		.github\ISSUE_TEMPLATE\lyric-timestamp-shift.yml = .github\ISSUE_TEMPLATE\lyric-timestamp-shift.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{85AC6BB7-4E24-4CF4-B2DB-96D9591DE079}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\FetchLyrics.yml = .github\workflows\FetchLyrics.yml
 	EndProjectSection
@@ -23,6 +31,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E4C159BB-BECF-4E4E-9DCF-163D90BB5950} = {56AB806F-D7F0-44C2-9F96-DC2CFAFFE936}
+		{85AC6BB7-4E24-4CF4-B2DB-96D9591DE079} = {56AB806F-D7F0-44C2-9F96-DC2CFAFFE936}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94272793-9887-4D1C-A3A0-DB4011B52619}

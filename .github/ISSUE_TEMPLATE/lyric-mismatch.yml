@@ -17,11 +17,19 @@ body:
       placeholder: ex. https://www.youtube.com/watch?v=eYP8h2z0qN8&t=461&end=738&share=1
     validations:
       required: true
+  - type: input
+    id: correctLyric
+    attributes:
+      label: Correct lyric
+      description: If it is convenient, please find the correct lyric at [Netease Music](https://music.163.com/#/search/), and paste the link here.
+      placeholder: ex. https://music.163.com/#/song?id=490602360
+    validations:
+      required: false
   - type: textarea
     id: details
     attributes:
       label: More details
-      description: If it is convenient, please give us more details. Can you provide the correct lyrics or links? 
+      description: If it is convenient, please give us more details.  
     validations:
       required: false
   - type: markdown

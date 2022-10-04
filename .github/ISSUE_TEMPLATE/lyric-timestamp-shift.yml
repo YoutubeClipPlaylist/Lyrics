@@ -8,7 +8,7 @@ body:
       value: |
         ## The timestamp of the lyrics is shifted
         > This issue template is for timestamp of the lyrics is shifted.
-        > If it is a mismatch between lyrics and songs, please fill out another template.
+        > If it is a mismatch between lyrics and songs, please fill out [another template](/issues/new?assignees=&labels=Lyric+mismatch&template=lyric-mismatch.yml&title=%5BLyric+mismatch%5D).
   - type: input
     id: share
     attributes:
@@ -17,11 +17,29 @@ body:
       placeholder: ex. https://www.youtube.com/watch?v=eYP8h2z0qN8&t=461&end=738&share=1
     validations:
       required: true
+  - type: dropdown
+    id: fast_slow
+    attributes:
+      label: Is the lyric too fast? Too slow?
+      multiple: false
+      options:
+        - Too fast
+        - Too slow
+        - I'm not sure
+    validations:
+      required: true
+  - type: input
+    id: offset
+    attributes:
+      label: Shifted by about how many seconds?
+      placeholder: ex. 3
+    validations:
+      required: true
   - type: textarea
     id: details
     attributes:
       label: More details
-      description: If it is convenient, please give us more details. Is it too fast? Too slow? Offset by about a few seconds?
+      description: If it is convenient, please give us more details.  
     validations:
       required: false
   - type: markdown
