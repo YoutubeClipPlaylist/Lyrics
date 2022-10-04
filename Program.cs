@@ -264,9 +264,15 @@ static async Task DownloadLyricAndWriteFileAsync(CloudMusicApi api, int songId)
 
 static async Task<(int songId, string songName)> GetSongIdAsync(CloudMusicApi api, ISong song, int offset = 0)
 {
+    string keywords = Regex.Replace(song.Title, @"[\(\[].*[\]\)]", "").Trim();
+    if (string.IsNullOrEmpty(keywords))
+    {
+        throw new ArgumentException("Song Title keywords invalid");
+    }
+
     (bool isOk, JObject json) = await api.RequestAsync(CloudMusicApiProviders.Search,
                                                        new Dictionary<string, object> {
-                                                           { "keywords", song.Title },
+                                                           { "keywords", keywords },
                                                            { "type", 1 },
                                                            { "limit", 1 },
                                                            { "offset", offset }
