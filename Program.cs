@@ -255,7 +255,7 @@ static async Task DownloadLyricAndWriteFileAsync(CloudMusicApi api, int songId)
         || !Regex.IsMatch(lyricString, @"\[\d{2}:\d{2}.\d{2,5}\]")
         || lyricString.Split('\n').Length < 3)
     {
-        throw new Exception("Found a invalid lyric.");
+        throw new Exception("Found an invalid lyric.");
     }
 
     await File.WriteAllTextAsync($"Lyrics/{songId}.lrc", lyricString, System.Text.Encoding.UTF8);
