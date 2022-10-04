@@ -253,7 +253,7 @@ static async Task DownloadLyricAndWriteFileAsync(CloudMusicApi api, int songId)
 
     if (lyricString.Contains("纯音乐，请欣赏")
         || !Regex.IsMatch(lyricString, @"\[\d{2}:\d{2}.\d{2,5}\]")
-        || lyricString.Split('\n').Length < 3)
+        || lyricString.Split('\n').Length < 6)
     {
         throw new Exception("Found an invalid lyric.");
     }
