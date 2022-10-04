@@ -154,28 +154,31 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
                 continue;
             }
 
-            // Find local .lrc file.
-            if (!File.Exists($"Lyrics/{songId}.lrc"))
+            try
             {
-                // Download lyric by id at Netease Cloud Music.
-                await Task.Delay(TimeSpan.FromMilliseconds(random.Next(500, 1500)));
+                await DownloadLyricAndWriteFileAsync(api, songId);
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine($"{e.Message} {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
+                Console.Error.WriteLine("Try with second song match.");
 
-                string? lyricString = await GetLyricAsync(api, songId);
-
-                if (string.IsNullOrEmpty(lyricString))
+                (songId, songName) = await GetSongIdAsync(api, song, 1);
+                try
                 {
-                    Console.Error.WriteLine($"Can't find lyric. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}, {songId}, {songName}");
+                    await DownloadLyricAndWriteFileAsync(api, songId);
+                }
+                catch (ArgumentException)
+                {
+                    Console.Error.WriteLine($"Can't find second song match. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
                     continue;
                 }
-
-                if (lyricString.Contains("纯音乐，请欣赏")
-                    || !Regex.IsMatch(lyricString, @"\[\d{2}:\d{2}.\d{2,5}\]"))
+                catch (Exception)
                 {
-                    Console.Error.WriteLine($"Found a invalid lyric. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}, {songId}, {songName}");
+                    Console.Error.WriteLine($"{e.Message} {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
+                    Console.Error.WriteLine("Failed again with second song match.");
                     continue;
                 }
-
-                File.WriteAllText($"Lyrics/{songId}.lrc", lyricString, System.Text.Encoding.UTF8);
             }
 
             lyrics.Add(new Lyric()
@@ -199,13 +202,48 @@ static async Task ProcessNewSongs(List<ILyric> lyrics, List<ISong> diffList)
     }
 }
 
-static async Task<(int songId, string songName)> GetSongIdAsync(CloudMusicApi api, ISong song)
+static async Task DownloadLyricAndWriteFileAsync(CloudMusicApi api, int songId)
+{
+    if (songId == 0)
+    {
+        throw new ArgumentException("SongId invalid.", nameof(songId));
+    }
+
+    // Find local .lrc file.
+    if (File.Exists($"Lyrics/{songId}.lrc"))
+    {
+        Console.WriteLine($"Lyric file {songId}.lrc already exists.");
+        return;
+    }
+
+    await Task.Delay(TimeSpan.FromMilliseconds(new Random().Next(500, 1500)));
+
+    // Download lyric by id at Netease Cloud Music.
+    string? lyricString = await GetLyricAsync(api, songId);
+
+    if (string.IsNullOrEmpty(lyricString))
+    {
+        throw new Exception("Can't find lyric.");
+    }
+
+    if (lyricString.Contains("纯音乐，请欣赏")
+        || !Regex.IsMatch(lyricString, @"\[\d{2}:\d{2}.\d{2,5}\]"))
+    {
+        throw new Exception("Found a invalid lyric.");
+    }
+
+    await File.WriteAllTextAsync($"Lyrics/{songId}.lrc", lyricString, System.Text.Encoding.UTF8);
+    Console.WriteLine($"Write new lyric file {songId}.lrc.");
+}
+
+static async Task<(int songId, string songName)> GetSongIdAsync(CloudMusicApi api, ISong song, int offset = 0)
 {
     (bool isOk, JObject json) = await api.RequestAsync(CloudMusicApiProviders.Search,
                                                        new Dictionary<string, object> {
                                                            { "keywords", song.Title },
                                                            { "type", 1 },
-                                                           { "limit", 1 }
+                                                           { "limit", 1 },
+                                                           { "offset", offset }
                                                        });
     if (!isOk || null == json)
     {
