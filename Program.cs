@@ -133,13 +133,15 @@ static List<ISong> FilterNewSongs(List<ISong> songs, List<ILyric> lyrics)
 
 async Task CheckOldSongs(CloudMusicApi api, List<ILyric> lyrics)
 {
-    HashSet<string> files = new DirectoryInfo("Lyrics").GetFiles()
-                                                       .Select(p => p.Name)
-                                                       .ToHashSet();
     Console.WriteLine("Start to check old songs...");
+
+    // Download missing lyric files.
+    HashSet<string> existsFiles = new DirectoryInfo("Lyrics").GetFiles()
+                                                             .Select(p => p.Name)
+                                                             .ToHashSet();
     foreach (var lyric in lyrics)
     {
-        if (!files.Contains(lyric.LyricId + ".lrc"))
+        if (!existsFiles.Contains(lyric.LyricId + ".lrc"))
         {
             try
             {
@@ -150,6 +152,19 @@ async Task CheckOldSongs(CloudMusicApi api, List<ILyric> lyrics)
                 Console.Error.WriteLine($"Failed to download lyric {lyric.LyricId}: {e.Message}");
                 continue;
             }
+        }
+    }
+
+    // Delete lyric files which are not in used.
+    HashSet<string> usedFiles = lyrics.Select(p => p.LyricId + ".lrc")
+                                      .Distinct()
+                                      .ToHashSet();
+
+    foreach (var file in existsFiles)
+    {
+        if (!usedFiles.Any(p => p == file))
+        {
+            File.Delete(file);
         }
     }
     Console.WriteLine("Finish checking old songs.");
