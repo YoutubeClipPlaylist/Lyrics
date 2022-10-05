@@ -42,6 +42,7 @@ try
 catch (Exception e)
 {
     Console.WriteLine("Unhandled exception: " + e.Message);
+    Console.WriteLine(e.StackTrace);
     Environment.Exit(-1);
 }
 finally
