@@ -52,13 +52,16 @@ finally
 void ProcessExit(object? sender, EventArgs e)
 {
     Console.WriteLine("Writing Lyrics.json...");
-    File.WriteAllText("Lyrics.json", JsonSerializer.Serialize(
-        lyrics.ToArray(),
-        options: new()
-        {
-            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-            WriteIndented = true,
-        }));
+    File.WriteAllText(
+        "Lyrics.json",
+        JsonSerializer.Serialize(
+            lyrics.ToArray(),
+            options: new()
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                WriteIndented = true,
+            }),
+        System.Text.Encoding.UTF8);
     Console.WriteLine("Gracefully exit.");
 }
 
@@ -211,7 +214,7 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
                 VideoId = song.VideoId,
                 StartTime = song.StartTime,
                 LyricId = songId,
-                Title = Regex.Unescape(songName)
+                Title = songName
             });
 
             Console.WriteLine($"Get lyric {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}, {songId}, {songName}");
