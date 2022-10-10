@@ -230,7 +230,8 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
                 VideoId = song.VideoId,
                 StartTime = song.StartTime,
                 LyricId = songId,
-                Title = songName
+                Title = songName,
+                Offset = 0
             });
 
             Console.WriteLine($"Get lyric {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}, {songId}, {songName}");

@@ -9,7 +9,8 @@ public interface ILyric
     int LyricId { get; set; }
     int StartTime { get; set; }
     string VideoId { get; set; }
-    public string Title { get; set; }
+    string Title { get; set; }
+    int Offset { get; set; }
 }
 
 public class Lyric : ILyric
@@ -18,6 +19,7 @@ public class Lyric : ILyric
     public int StartTime { get; set; }
     public int LyricId { get; set; }
     public string Title { get; set; } = "";
+    public int Offset { get; set; }
 }
 
 class LyricConverter : JsonConverter<ILyric>
@@ -33,6 +35,7 @@ class LyricConverter : JsonConverter<ILyric>
             lyric.StartTime = queue.Dequeue().GetInt32();
             lyric.LyricId = queue.Dequeue().GetInt32();
             lyric.Title = queue.Dequeue().GetString() ?? "";
+            lyric.Offset = queue.Dequeue().GetInt32();
         }
         catch (InvalidOperationException) { }
 
@@ -45,7 +48,8 @@ class LyricConverter : JsonConverter<ILyric>
             value.VideoId,
             value.StartTime,
             value.LyricId,
-            value.Title
+            value.Title,
+            value.Offset
         }, options);
 }
 
