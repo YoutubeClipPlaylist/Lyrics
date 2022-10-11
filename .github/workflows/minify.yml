@@ -18,9 +18,13 @@ jobs:
         with:
           ref: lyrics
 
-      - uses: zofrex/mirror-branch@v1
+      - uses: jojomatik/sync-branch@v1
         with:
-          target-branch: minify
+          source: 'lyrics'
+          target: 'minify'
+          strategy: 'force'
+          git_committer_name: Minify Action Bot
+          git_committer_email: actions@github.com
 
       # Use https://github.com/Josee9988/MinifyAllCli
       - name: Minify Action
