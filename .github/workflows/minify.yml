@@ -2,7 +2,11 @@ name: Minify
 
 on:
   push:
-    branches: [lyrics]
+    branches:
+      - lyrics
+  workflow_run:
+    workflows: [Fetch Lyrics]
+    types: [completed]
   workflow_dispatch:
 
 jobs:
@@ -10,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
-          ref: ${{ github.head_ref }}
+          ref: lyrics
 
       - uses: zofrex/mirror-branch@v1
         with:
