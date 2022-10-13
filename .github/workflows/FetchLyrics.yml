@@ -20,7 +20,7 @@ jobs:
       - run: dotnet publish /p:Configuration=Release /p:PublishProfile=FolderProfile
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: artifact
           path: bin/Release/net6.0/publish/win-x64
@@ -38,7 +38,7 @@ jobs:
         run: git submodule update --init --recursive && git submodule update --recursive --remote
 
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: artifact
 
