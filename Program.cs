@@ -6,10 +6,15 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Text.Unicode;
 
-if (!int.TryParse(Environment.GetEnvironmentVariable("MAXCOUNT"), out int maxCount))
+if (!int.TryParse(Environment.GetEnvironmentVariable("MAX_COUNT"), out int maxCount))
 {
     maxCount = 2000;
 }
+if (!bool.TryParse(Environment.GetEnvironmentVariable("RETRY_FAILED_LYRICS"), out bool retryFailedLyrics))
+{
+    retryFailedLyrics = false;
+}
+
 List<ISong> songs = new();
 List<ILyric> lyrics = new();
 
@@ -20,13 +25,14 @@ Console.CancelKeyPress += ProcessExit;
 Directory.CreateDirectory("Lyrics");
 Directory.CreateDirectory("Playlists");
 File.Create("Lyrics/0.lrc").Close();
+File.Create("Lyrics/1.lrc").Close();
 #endif
 
 try
 {
     ReadJsonFiles(songs, lyrics);
 
-    List<ISong> diffList = FilterNewSongs(songs, lyrics);
+    List<ISong> diffList = FilterNewSongs(songs, lyrics, retryFailedLyrics);
 
     if (diffList.Count > maxCount)
     {
@@ -125,8 +131,10 @@ static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
     }
 }
 
-static List<ISong> FilterNewSongs(List<ISong> songs, List<ILyric> lyrics)
+static List<ISong> FilterNewSongs(List<ISong> songs, List<ILyric> lyrics, bool retryFailedLyrics)
 {
+    if (retryFailedLyrics) lyrics.RemoveAll(p => p.LyricId == 1);
+
     HashSet<string> lyricsHashSet = new(lyrics.Select(p => p.VideoId + p.StartTime));
     return songs.Where(p => !lyricsHashSet.Contains(p.VideoId + p.StartTime)).ToList();
 }
@@ -141,6 +149,8 @@ async Task CheckOldSongs(CloudMusicApi api, List<ILyric> lyrics)
                                                              .ToHashSet();
     foreach (var lyric in lyrics)
     {
+        if (lyric.LyricId < 10) continue;
+
         if (!existsFiles.Contains(lyric.LyricId + ".lrc"))
         {
             try
@@ -179,28 +189,34 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
         ISong? song = diffList[i];
         try
         {
-            int songId = 0;
+            // -1: Init
+            // 0: Disable manually
+            // 1: Can't find
+            int songId = -1;
             string songName = string.Empty;
 
             // Find lyric id at local.
             ILyric? existLyric = lyrics.Find(p => p.Title == song.Title);
             if (null != existLyric)
+            {
                 (songId, songName) = (existLyric.LyricId, existLyric.Title);
-
+            }
+            else
             // Find lyric id at Netease Cloud Music.
-            if (null == existLyric)
+            {
                 (songId, songName) = await GetSongIdAsync(api, song);
 
-            // Can't find lyrics from internet.
-            if (default == songId)
-            {
-                Console.Error.WriteLine($"Can't find song. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
-                continue;
+                // Can't find lyrics from internet.
+                if (default == songId)
+                {
+                    Console.Error.WriteLine($"Can't find song. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
+                    songId = 1;
+                }
             }
 
             try
             {
-                await DownloadLyricAndWriteFileAsync(api, songId);
+                if (songId > 10) await DownloadLyricAndWriteFileAsync(api, songId);
             }
             catch (Exception e)
             {
@@ -215,13 +231,13 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
                 catch (ArgumentException)
                 {
                     Console.Error.WriteLine($"Can't find second song match. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
-                    continue;
+                    songId = 1;
                 }
                 catch (Exception)
                 {
                     Console.Error.WriteLine($"{e.Message} {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
                     Console.Error.WriteLine("Failed again with second song match.");
-                    continue;
+                    songId = 1;
                 }
             }
 
@@ -249,7 +265,7 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
 
 static async Task DownloadLyricAndWriteFileAsync(CloudMusicApi api, int songId)
 {
-    if (songId == 0)
+    if (songId < 10)
     {
         throw new ArgumentException("SongId invalid.", nameof(songId));
     }
