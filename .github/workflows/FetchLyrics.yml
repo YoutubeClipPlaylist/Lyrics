@@ -7,6 +7,17 @@ on:
   schedule:
     - cron: '0 0 * * 0'
   workflow_dispatch:
+    inputs:
+        retry_failed_lyrics:
+            description: 'retry_failed_lyrics'
+            required: false
+            type: boolean
+            default: false
+        max_count:
+            description: 'max_count'
+            required: false
+            type: number
+            default: 2000
 
 jobs:
   build:
@@ -24,7 +35,7 @@ jobs:
         with:
           name: artifact
           path: bin/Release/net6.0/publish/win-x64
-          retention-days: 1
+          retention-days: 7
 
   Fetch_Lyrics:
     runs-on: windows-latest # dotnet SDK built-in
@@ -44,6 +55,9 @@ jobs:
 
       - name: Execute Lyrics.exe
         shell: cmd
+        env: 
+          RETRY_FAILED_LYRICS: ${{ github.event.inputs.retry_failed_lyrics }}
+          MAX_COUNT: ${{ github.event.inputs.max_count }}
         run: 'call Lyrics.exe'
 
       - name: Git Auto Commit
