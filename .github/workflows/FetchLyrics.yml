@@ -10,11 +10,24 @@ on:
     inputs:
       retry_failed_lyrics:
         description: 'retry_failed_lyrics'
-        required: false
         type: boolean
+        required: false
         default: false
       max_count:
         description: 'max_count'
+        type: string
+        required: false
+        default: '2000'
+  workflow_call:
+    inputs:
+      retry_failed_lyrics:
+        description: 'retry_failed_lyrics'
+        type: boolean
+        required: false
+        default: false
+      max_count:
+        description: 'max_count'
+        type: string
         required: false
         default: '2000'
 
