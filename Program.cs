@@ -205,7 +205,7 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
             string songName = string.Empty;
 
             // Find lyric id at local.
-            ILyric? existLyric = lyrics.Find(p => p.Title == song.Title);
+            ILyric? existLyric = lyrics.Find(p => p.Title.ToLower() == song.Title.ToLower());
             if (null != existLyric)
             {
                 (songId, songName) = (existLyric.LyricId, existLyric.Title);
