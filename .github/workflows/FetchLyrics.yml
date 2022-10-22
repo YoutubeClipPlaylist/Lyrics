@@ -16,8 +16,7 @@ on:
         max_count:
             description: 'max_count'
             required: false
-            type: number
-            default: 2000
+            default: "2000"
 
 jobs:
   build:
