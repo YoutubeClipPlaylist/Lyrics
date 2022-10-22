@@ -178,7 +178,7 @@ async Task CheckOldSongs(CloudMusicApi api, List<ILyric> lyrics)
     {
         if (!usedFiles.Any(p => p == file))
         {
-            File.Delete(file);
+            File.Delete(Path.Combine("Lyrics", file));
             Console.WriteLine($"Delete {file} because it is not in used.");
         }
     }
@@ -223,7 +223,7 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
                 }
             }
 
-            if (failedIds.Contains(songId)) 
+            if (failedIds.Contains(songId))
                 songId = -songId;
 
             if (songId > 0)
