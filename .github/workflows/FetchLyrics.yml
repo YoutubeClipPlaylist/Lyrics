@@ -64,6 +64,7 @@ jobs:
         with:
           branch: lyrics
           file_pattern: Lyrics Lyrics.json
+          skip_checkout: true
           commit_message: 'Github Action: Fetch Lyrics'
           commit_user_name: Github Action Bot # defaults to "GitHub Actions"
           commit_author: Github Action Bot <actions@github.com> # defaults to author of the commit that triggered the run
