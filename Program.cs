@@ -146,26 +146,31 @@ async Task CheckOldSongs(CloudMusicApi api, List<ILyric> lyrics)
     HashSet<string> existsFiles = new DirectoryInfo("Lyrics").GetFiles()
                                                              .Select(p => p.Name)
                                                              .ToHashSet();
+    HashSet<string> failedFiles = new();
+
     foreach (var lyric in lyrics)
     {
         if (lyric.LyricId <= 0) continue;
+        var filename = lyric.LyricId + ".lrc";
 
-        if (!existsFiles.Contains(lyric.LyricId + ".lrc"))
+        if (existsFiles.Contains(filename)
+            || failedFiles.Contains(filename)) continue;
+
+        try
         {
-            try
-            {
-                await DownloadLyricAndWriteFileAsync(api, lyric.LyricId);
-            }
-            catch (Exception e)
-            {
-                Console.Error.WriteLine($"Failed to download lyric {lyric.LyricId}: {e.Message}");
-                continue;
-            }
+            await DownloadLyricAndWriteFileAsync(api, lyric.LyricId);
+            existsFiles.Add(filename);
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine($"Failed to download lyric {lyric.LyricId}: {e.Message}");
+            failedFiles.Add(filename);
         }
     }
 
     // Delete lyric files which are not in used.
-    HashSet<string> usedFiles = lyrics.Select(p => p.LyricId + ".lrc")
+    HashSet<string> usedFiles = lyrics.Where(p => p.LyricId >= 0)
+                                      .Select(p => p.LyricId + ".lrc")
                                       .Distinct()
                                       .ToHashSet();
 
@@ -174,14 +179,19 @@ async Task CheckOldSongs(CloudMusicApi api, List<ILyric> lyrics)
         if (!usedFiles.Any(p => p == file))
         {
             File.Delete(file);
+            Console.WriteLine($"Delete {file} because it is not in used.");
         }
     }
+
     Console.WriteLine("Finish checking old songs.");
+    Console.WriteLine($"Exist files count: {new DirectoryInfo("Lyrics").GetFiles().Length}");
+    Console.WriteLine($"Failed count: {failedFiles.Count}");
 }
 
 static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<ISong> diffList)
 {
     Random random = new();
+    HashSet<int> failedIds = new();
 
     for (int i = 0; i < diffList.Count; i++)
     {
@@ -213,37 +223,45 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
                 }
             }
 
-            try
-            {
-                if (songId > 0) await DownloadLyricAndWriteFileAsync(api, songId);
-            }
-            catch (Exception e)
-            {
-                Console.Error.WriteLine($"{e.Message} {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
-                Console.Error.WriteLine("Try with second song match.");
+            if (failedIds.Contains(songId)) 
+                songId = -songId;
 
-                var (songId2, songName2) = await GetSongIdAsync(api, song, 1);
-
-                // Can't find song from internet.
-                if (songId2 == 0)
+            if (songId > 0)
+            {
+                try
                 {
-                    Console.Error.WriteLine($"Can't find second song match. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
-                    songId = -songId;
+                    await DownloadLyricAndWriteFileAsync(api, songId);
                 }
-                else
+                catch (Exception e)
                 {
-                    try
+                    Console.Error.WriteLine($"{e.Message} {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
+                    Console.Error.WriteLine("Try with second song match.");
+
+                    var (songId2, songName2) = await GetSongIdAsync(api, song, 1);
+
+                    // Can't find song from internet.
+                    if (songId2 == 0)
                     {
-                        await DownloadLyricAndWriteFileAsync(api, songId2);
-                        (songId, songName) = (songId2, songName2);
-                    }
-                    catch (Exception e2)
-                    {
-                        Console.Error.WriteLine($"{e2.Message} {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
-                        Console.Error.WriteLine("Failed again with second song match.");
+                        Console.Error.WriteLine($"Can't find second song match. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
                         songId = -songId;
                     }
+                    else
+                    {
+                        try
+                        {
+                            await DownloadLyricAndWriteFileAsync(api, songId2);
+                            (songId, songName) = (songId2, songName2);
+                        }
+                        catch (Exception e2)
+                        {
+                            Console.Error.WriteLine($"{e2.Message} {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
+                            Console.Error.WriteLine("Failed again with second song match.");
+                            songId = -songId;
+                        }
+                    }
                 }
+
+                if (songId < -1) failedIds.Add(-songId);
             }
 
             lyrics.Add(new Lyric()
