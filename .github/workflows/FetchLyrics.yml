@@ -8,15 +8,15 @@ on:
     - cron: '0 0 * * 0'
   workflow_dispatch:
     inputs:
-        retry_failed_lyrics:
-            description: 'retry_failed_lyrics'
-            required: false
-            type: boolean
-            default: false
-        max_count:
-            description: 'max_count'
-            required: false
-            default: "2000"
+      retry_failed_lyrics:
+        description: 'retry_failed_lyrics'
+        required: false
+        type: boolean
+        default: false
+      max_count:
+        description: 'max_count'
+        required: false
+        default: '2000'
 
 jobs:
   build:
@@ -54,7 +54,7 @@ jobs:
 
       - name: Execute Lyrics.exe
         shell: cmd
-        env: 
+        env:
           RETRY_FAILED_LYRICS: ${{ github.event.inputs.retry_failed_lyrics }}
           MAX_COUNT: ${{ github.event.inputs.max_count }}
         run: 'call Lyrics.exe'
@@ -63,7 +63,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: lyrics
-          file_pattern: 'Lyrics/ Lyrics.json'
+          file_pattern: Lyrics Lyrics.json
           commit_message: 'Github Action: Fetch Lyrics'
           commit_user_name: Github Action Bot # defaults to "GitHub Actions"
           commit_author: Github Action Bot <actions@github.com> # defaults to author of the commit that triggered the run
