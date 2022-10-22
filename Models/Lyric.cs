@@ -48,7 +48,7 @@ class LyricConverter : JsonConverter<ILyric>
             value.VideoId,
             value.StartTime,
             value.LyricId,
-            value.Title,
+            value.Title ?? "",
             value.Offset
         }, options);
 }

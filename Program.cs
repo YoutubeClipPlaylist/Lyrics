@@ -25,7 +25,6 @@ Console.CancelKeyPress += ProcessExit;
 Directory.CreateDirectory("Lyrics");
 Directory.CreateDirectory("Playlists");
 File.Create("Lyrics/0.lrc").Close();
-File.Create("Lyrics/1.lrc").Close();
 #endif
 
 try
@@ -133,7 +132,7 @@ static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
 
 static List<ISong> FilterNewSongs(List<ISong> songs, List<ILyric> lyrics, bool retryFailedLyrics)
 {
-    if (retryFailedLyrics) lyrics.RemoveAll(p => p.LyricId == 1);
+    if (retryFailedLyrics) lyrics.RemoveAll(p => p.LyricId < 0);
 
     HashSet<string> lyricsHashSet = new(lyrics.Select(p => p.VideoId + p.StartTime));
     return songs.Where(p => !lyricsHashSet.Contains(p.VideoId + p.StartTime)).ToList();
@@ -149,7 +148,7 @@ async Task CheckOldSongs(CloudMusicApi api, List<ILyric> lyrics)
                                                              .ToHashSet();
     foreach (var lyric in lyrics)
     {
-        if (lyric.LyricId < 10) continue;
+        if (lyric.LyricId <= 0) continue;
 
         if (!existsFiles.Contains(lyric.LyricId + ".lrc"))
         {
@@ -187,11 +186,11 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
     for (int i = 0; i < diffList.Count; i++)
     {
         ISong? song = diffList[i];
+        song.Title = Regex.Replace(song.Title, @"[「【\(\[].*[」】\]\)]", "").Trim();
         try
         {
             // -1: Init
             // 0: Disable manually
-            // 1: Can't find
             int songId = -1;
             string songName = string.Empty;
 
@@ -206,38 +205,44 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
             {
                 (songId, songName) = await GetSongIdAsync(api, song);
 
-                // Can't find lyrics from internet.
-                if (default == songId)
+                // Can't find song from internet.
+                if (songId == 0)
                 {
                     Console.Error.WriteLine($"Can't find song. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
-                    songId = 1;
+                    songId = -1;
                 }
             }
 
             try
             {
-                if (songId > 10) await DownloadLyricAndWriteFileAsync(api, songId);
+                if (songId > 0) await DownloadLyricAndWriteFileAsync(api, songId);
             }
             catch (Exception e)
             {
                 Console.Error.WriteLine($"{e.Message} {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
                 Console.Error.WriteLine("Try with second song match.");
 
-                (songId, songName) = await GetSongIdAsync(api, song, 1);
-                try
-                {
-                    await DownloadLyricAndWriteFileAsync(api, songId);
-                }
-                catch (ArgumentException)
+                var (songId2, songName2) = await GetSongIdAsync(api, song, 1);
+
+                // Can't find song from internet.
+                if (songId2 == 0)
                 {
                     Console.Error.WriteLine($"Can't find second song match. {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
-                    songId = 1;
+                    songId = -songId;
                 }
-                catch (Exception)
+                else
                 {
-                    Console.Error.WriteLine($"{e.Message} {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
-                    Console.Error.WriteLine("Failed again with second song match.");
-                    songId = 1;
+                    try
+                    {
+                        await DownloadLyricAndWriteFileAsync(api, songId2);
+                        (songId, songName) = (songId2, songName2);
+                    }
+                    catch (Exception e2)
+                    {
+                        Console.Error.WriteLine($"{e2.Message} {i + 1}/{diffList.Count}: {song.VideoId}, {song.StartTime}");
+                        Console.Error.WriteLine("Failed again with second song match.");
+                        songId = -songId;
+                    }
                 }
             }
 
@@ -246,7 +251,7 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
                 VideoId = song.VideoId,
                 StartTime = song.StartTime,
                 LyricId = songId,
-                Title = songName,
+                Title = Regex.Replace(songName ?? "", @"[「【\(\[].*[」】\]\)]", "").Trim(),
                 Offset = 0
             });
 
@@ -265,7 +270,7 @@ static async Task ProcessNewSongs(CloudMusicApi api, List<ILyric> lyrics, List<I
 
 static async Task DownloadLyricAndWriteFileAsync(CloudMusicApi api, int songId)
 {
-    if (songId < 10)
+    if (songId <= 0)
     {
         throw new ArgumentException("SongId invalid.", nameof(songId));
     }
@@ -300,15 +305,14 @@ static async Task DownloadLyricAndWriteFileAsync(CloudMusicApi api, int songId)
 
 static async Task<(int songId, string songName)> GetSongIdAsync(CloudMusicApi api, ISong song, int offset = 0)
 {
-    string keywords = Regex.Replace(song.Title, @"[\(\[].*[\]\)]", "").Trim();
-    if (string.IsNullOrEmpty(keywords))
+    if (string.IsNullOrEmpty(song.Title))
     {
-        throw new ArgumentException("Song Title keywords invalid");
+        throw new ArgumentException("Song Title invalid");
     }
 
     (bool isOk, JObject json) = await api.RequestAsync(CloudMusicApiProviders.Search,
                                                        new Dictionary<string, object> {
-                                                           { "keywords", keywords },
+                                                           { "keywords", song.Title},
                                                            { "type", 1 },
                                                            { "limit", 1 },
                                                            { "offset", offset }
