@@ -1,10 +1,14 @@
 ﻿using Lyrics.Models;
+using Microsoft.Extensions.Configuration;
 using NeteaseCloudMusicApi;
 using Newtonsoft.Json.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Text.Unicode;
+
+IOptions? option = null;
+option = Start(option);
 
 if (!int.TryParse(Environment.GetEnvironmentVariable("MAX_COUNT"), out int maxCount))
 {
@@ -14,6 +18,12 @@ if (!bool.TryParse(Environment.GetEnvironmentVariable("RETRY_FAILED_LYRICS"), ou
 {
     retryFailedLyrics = false;
 }
+
+List<(string, int)> excludeSongs = 
+    option.ExcludeVideos.SelectMany(x => x.StartTimes.Select(y => (x.VideoId, y)))
+                        .Concat(option.ExcludeVideos.Where(p => p.StartTimes.Length == 0)
+                                                    .Select(p => (p.VideoId, -1)))
+                        .ToList();
 
 List<ISong> songs = new();
 List<ILyric> lyrics = new();
@@ -29,7 +39,7 @@ File.Create("Lyrics/0.lrc").Close();
 
 try
 {
-    ReadJsonFiles(songs, lyrics);
+    ReadJsonFiles(songs, lyrics, excludeSongs);
 
     List<ISong> diffList = FilterNewSongs(songs, lyrics, retryFailedLyrics);
 
@@ -55,6 +65,36 @@ finally
     Environment.Exit(0);
 }
 
+static IOptions Start(IOptions? option)
+{
+    try
+    {
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+#if DEBUG
+            .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+#endif
+            .AddEnvironmentVariables()
+            .Build();
+
+        option = configuration.Get<Options>();
+        if (null == option
+            || null == option.ExcludeVideos)
+        {
+            throw new ApplicationException("Settings file is not valid.");
+        }
+        Console.WriteLine($"Get {option.ExcludeVideos.Length} exclude videos.");
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e.Message);
+        Console.WriteLine("ERROR_BAD_CONFIGURATION");
+        Environment.Exit(1610); // ERROR_BAD_CONFIGURATION
+    }
+
+    return option;
+}
+
 void ProcessExit(object? sender, EventArgs e)
 {
     Console.WriteLine("Writing Lyrics.json...");
@@ -71,7 +111,7 @@ void ProcessExit(object? sender, EventArgs e)
     Console.WriteLine("Gracefully exit.");
 }
 
-static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
+static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics, List<(string VideoId,int StartTime)> excludeSongs)
 {
     JsonSerializerOptions option = new()
     {
@@ -83,6 +123,8 @@ static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
     {
         ReadPlaylists();
         ReadLyrics();
+        RemoveExcludeSongs();
+        RemoveLyricsNotContainsInSongs();
     }
     catch (JsonException)
     {
@@ -127,6 +169,27 @@ static void ReadJsonFiles(List<ISong> songs, List<ILyric> lyrics)
         List<ILyric> temp2 = JsonSerializer.Deserialize<List<ILyric>>(fs2, option) ?? new();
         Console.WriteLine($"Loaded {temp2.Count} lyrics.");
         lyrics.AddRange(temp2);
+    }
+
+    void RemoveExcludeSongs()
+    {
+        var hashSet = excludeSongs.ToHashSet();
+        var count = songs.RemoveAll(p => hashSet.Contains((p.VideoId, p.StartTime)));
+        excludeSongs.Where(p => p.Item2 == -1)
+                    .ToList()
+                    .ForEach((excludeVideoId) =>
+                    {
+                        count += songs.RemoveAll(p => p.VideoId == excludeVideoId.VideoId);
+                    });
+        Console.WriteLine($"Exclude {count} songs from exclude list.");
+    }
+
+    void RemoveLyricsNotContainsInSongs()
+    {
+        var songsHashSet = songs.Select(p => (p.VideoId, p.StartTime))
+                                .ToHashSet();
+        var count = lyrics.RemoveAll(p => !songsHashSet.Contains((p.VideoId, p.StartTime)));
+        Console.WriteLine($"Remove {count} lyrics because of not contains in playlists.");
     }
 }
 
