@@ -37,6 +37,7 @@
 |      メリッサ      |                            [第一搜尋結果](https://music.163.com/#/song?id=28272046)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/api/song/media?id=799457)                            |
 |      U&I       |                          [第一搜尋結果](https://music.163.com/#/song?id=22803891)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/api/song/media?id=1317091851)                          |
 |       さぁ       |                               [原曲](https://music.163.com/#/song?id=32288465)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/api/song/media?id=29191482)                               |
+|  凛々咲原創曲   |                                                                        在網易上有頁面但沒有歌詞，執行時一定會跳invalid                                                                         |
 
 ## LICENSE
 
