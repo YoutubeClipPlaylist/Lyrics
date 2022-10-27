@@ -8,7 +8,10 @@ namespace Lyrics;
 
 public static class Startup
 {
-    public static void Configure(out int MAX_COUNT, out bool RETRY_FAILED_LYRICS, out List<(string, int)> excludeSongs)
+    public static void Configure(out int MAX_COUNT,
+                                 out bool RETRY_FAILED_LYRICS,
+                                 out List<(string, int)> excludeSongs,
+                                 out List<ILyric> lyricsFromENV)
     {
         IOptions option = PrepareOptions();
 
@@ -25,6 +28,25 @@ public static class Startup
                                            .Concat(option.ExcludeVideos.Where(p => p.StartTimes.Length == 0)
                                                                        .Select(p => (p.VideoId, -1)))
                                            .ToList();
+
+        string? lyricString = Environment.GetEnvironmentVariable("LYRICS");
+        lyricsFromENV = new();
+        if (!string.IsNullOrEmpty(lyricString))
+        {
+            try
+            {
+                lyricsFromENV = JsonSerializer.Deserialize<List<ILyric>>(lyricString) ?? new();
+                Console.WriteLine($"Get {lyricsFromENV.Count} lyrics from ENV.");
+            }
+            catch (JsonException)
+            {
+                Console.WriteLine("Failed to parse lyric json from ENV.");
+            }
+            catch (NotSupportedException)
+            {
+                Console.WriteLine("Failed to parse lyric json from ENV.");
+            }
+        }
 
 #if DEBUG
         Directory.CreateDirectory("Lyrics");

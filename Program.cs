@@ -13,16 +13,17 @@ internal partial class Program
     {
         Startup.Configure(out int MAX_COUNT,
                           out bool _RETRY_FAILED_LYRICS,
-                          out List<(string VideoId, int StartTime)> excludeSongs);
+                          out List<(string VideoId, int StartTime)> excludeSongs,
+                          out List<ILyric> lyricsFromENV);
         RETRY_FAILED_LYRICS = _RETRY_FAILED_LYRICS;
+        Lyrics.AddRange(lyricsFromENV);
 
         try
         {
             await ReadJsonFilesAsync();
-            //ReadENVLyrics();
             RemoveExcludeSongs(excludeSongs);
             RemoveLyricsNotContainsInSongs();
-            //RemoveDuplicatesLyrics();
+            RemoveDuplicatesLyrics();
 
             List<ISong> diffList = FilterNewSongs();
 

@@ -83,4 +83,30 @@ internal partial class Program
         Console.WriteLine($"Remove {count} lyrics because of not contains in playlists.");
     }
 
+    /// <summary>
+    /// Remove duplicate lyrics based on VideoId and StartTime. The first one will be used if duplicates.
+    /// </summary>
+    /// <returns></returns>
+    public static void RemoveDuplicatesLyrics()
+    {
+        var set = new HashSet<(string, int)>();
+        int count = 0;
+        for (int i = 0; i < Lyrics.Count; i++)
+        {
+            ILyric lyric = Lyrics[i];
+            if (!set.Contains((lyric.VideoId, lyric.StartTime)))
+            {
+                set.Add((lyric.VideoId, lyric.StartTime));
+            }
+            else
+            {
+                Lyrics.RemoveAt(i);
+                i--;
+                count++;
+            }
+        }
+        Console.WriteLine($"Remove {count} lyrics because of duplicates.");
+        Console.WriteLine($"Finally get {Lyrics.Count} lyrics.");
+    }
+
 }
