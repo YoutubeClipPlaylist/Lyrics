@@ -60,6 +60,9 @@ jobs:
         with:
           name: artifact
 
+      - name: Checkout appsettings.json from HEAD
+        run: 'git checkout HEAD appsettings.json'
+
       - name: Execute Lyrics.exe (workflow_dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: cmd
