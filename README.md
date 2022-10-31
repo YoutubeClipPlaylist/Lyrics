@@ -25,6 +25,7 @@
 |  オレンジ   | [オレンジ/流田Project(釘宮理恵,堀江由衣,喜多村英梨)](https://music.163.com/#/song?id=448741128)<br> [オレンジ/7!!](https://music.163.com/#/song?id=458725210)<br>[オレンジ/トーマ(初音ミク)](https://music.163.com/#/song?id=26310273) |
 |  S・K・Y  |                                              [S・K・Y/ライブP(鏡音リン)](https://music.163.com/#/song?id=1398679779)<br>[S•K•Y/さかな](https://music.163.com/#/song?id=1376649008)                                              |
 |  WILL   |                                               [WILL/米倉千尋](https://music.163.com/#/song?id=669130)<br>[WILL/TRUE](http://music.163.com/api/song/media?id=1479561919)                                               |
+|  orion  |              [orion/米津玄師](https://music.163.com/#/song?id=512377169)<br>[ORION/中島美嘉](https://music.163.com/#/song?id=624335)<br>[Orion/オゾン(初音ミク)](https://music.163.com/#/song?id=1467929478)               |
 
 ## 特殊狀況
 
