@@ -62,6 +62,20 @@ internal partial class Program
         }
     }
 
+    static void ProcessLyricsFromENV(List<ILyric> lyricFromENV)
+    {
+        foreach (var item in lyricFromENV)
+        {
+            ILyric? match = Lyrics.Find(p => p.VideoId == item.VideoId
+                                           && p.StartTime == item.StartTime);
+            if (null != match)
+            {
+                match.Offset = item.Offset;
+                //Lyrics.Insert(0, old);
+            }
+        }
+    }
+
     static void RemoveExcludeSongs(List<(string VideoId, int StartTime)> excludeSongs)
     {
         var hashSet = excludeSongs.ToHashSet();

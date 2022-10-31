@@ -16,11 +16,11 @@ internal partial class Program
                           out List<(string VideoId, int StartTime)> excludeSongs,
                           out List<ILyric> lyricsFromENV);
         RETRY_FAILED_LYRICS = _RETRY_FAILED_LYRICS;
-        Lyrics.AddRange(lyricsFromENV);
 
         try
         {
             await ReadJsonFilesAsync();
+            ProcessLyricsFromENV(lyricsFromENV);
             RemoveExcludeSongs(excludeSongs);
             RemoveLyricsNotContainsInSongs();
             RemoveDuplicatesLyrics();
