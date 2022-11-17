@@ -27,20 +27,25 @@
 |  WILL   |                                               [WILL/米倉千尋](https://music.163.com/#/song?id=669130)<br>[WILL/TRUE](http://music.163.com/api/song/media?id=1479561919)                                               |
 |  orion  |              [orion/米津玄師](https://music.163.com/#/song?id=512377169)<br>[ORION/中島美嘉](https://music.163.com/#/song?id=624335)<br>[Orion/オゾン(初音ミク)](https://music.163.com/#/song?id=1467929478)               |
 |  UNION  |                                      [UNION!!/765 MILLION ALLSTARS](http://music.163.com/api/song/media?id=865868058)<br>[UNION/OxT](https://music.163.com/#/song?id=1337263056)                                      |
-|  恋文   |                                       [恋文/やなぎなぎ《Rewrite》ED](https://music.163.com/#/song?id=26131698)<br>[恋文/Every Little Thing](https://music.163.com/#/song?id=22709795)                                        |
+|  恋文   |                                        [恋文/やなぎなぎ (Rewrite)](https://music.163.com/#/song?id=26131698)<br>[恋文/Every Little Thing](https://music.163.com/#/song?id=22709795)                                        |
+|  逆光   |                             [逆光/Ado (ONE PIECE FILM RED)](https://music.163.com/#/song?id=1961617004)<br>[逆光/坂本真綾 (Fate/Grand Order)](https://music.163.com/#/song?id=1294910588)                             |
+|  再会   |                              [再会/はるまきごはん(初音ミク)](http://music.163.com/api/song/media?id=1474338672)<br>[再会/LiSA Uru(produced by Ayase)](https://music.163.com/#/song?id=1492062605)                              |
+
 ## 特殊狀況
 
 一般來說是優先使用網易雲音樂上原曲的歌詞，下表記錄例外狀況
 
-|      曲目      |                                                                                             說明                                                                                              |
-|:--------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| INITIUM/久遠たま |                                                Cover專輯，[網易有頁面但沒有歌詞](https://music.163.com/#/album?id=149898107)，所以使用各原曲歌詞                                                |
-|  もってけ！セーラーふく   | [原曲](https://music.163.com/#/song?id=1440363252)、[第一搜尋結果](https://music.163.com/#/song?id=4919429)的歌詞都是錯誤的，使用此[正確歌詞](https://music.163.com/api/song/media?id=28892268) |
-|      メリッサ      |                            [第一搜尋結果](https://music.163.com/#/song?id=28272046)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/api/song/media?id=799457)                            |
-|      U&I       |                          [第一搜尋結果](https://music.163.com/#/song?id=22803891)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/api/song/media?id=1317091851)                          |
-|       さぁ       |                               [原曲](https://music.163.com/#/song?id=32288465)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/api/song/media?id=29191482)                               |
-|  凛々咲原創曲   |                                                                        在網易上有頁面但沒有歌詞，執行時一定會跳invalid                                                                         |
-|  My Treasure   |                               [Full歌曲](https://music.163.com/#/song?id=28838509)的歌詞是錯誤的，使用[TV size](https://music.163.com/#/song?id=29418475)的歌詞                                |
+|      曲目       |                                                                                             說明                                                                                              |
+|:---------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| INITIUM/久遠たま  |                                                Cover專輯，[網易有頁面但沒有歌詞](https://music.163.com/#/album?id=149898107)，所以使用各原曲歌詞                                                |
+|   もってけ！セーラーふく   | [原曲](https://music.163.com/#/song?id=1440363252)、[第一搜尋結果](https://music.163.com/#/song?id=4919429)的歌詞都是錯誤的，使用此[正確歌詞](https://music.163.com/api/song/media?id=28892268) |
+|      メリッサ       |                            [第一搜尋結果](https://music.163.com/#/song?id=28272046)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/api/song/media?id=799457)                            |
+|       U&I       |                          [第一搜尋結果](https://music.163.com/#/song?id=22803891)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/api/song/media?id=1317091851)                          |
+|       さぁ        |                               [原曲](https://music.163.com/#/song?id=32288465)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/api/song/media?id=29191482)                               |
+|   凛々咲原創曲   |                                                                        在網易上有頁面但沒有歌詞，執行時一定會跳invalid                                                                         |
+|   My Treasure   |                               [Full歌曲](https://music.163.com/#/song?id=28838509)的歌詞是錯誤的，使用[TV size](https://music.163.com/#/song?id=29418475)的歌詞                                |
+| わたしの一番かわいいところ |                                                            網易上只有[不OK的翻唱歌詞](https://music.163.com/#/song?id=1975358032)                                                             |
+|  拝啓ドッペルゲンガー   |                                  [原曲](https://music.163.com/#/song?id=484058936)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/#/song?id=524152940)                                  |
 
 ## LICENSE
 
