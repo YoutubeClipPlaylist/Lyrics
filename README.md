@@ -31,6 +31,9 @@
 |  逆光   |                             [逆光/Ado (ONE PIECE FILM RED)](https://music.163.com/#/song?id=1961617004)<br>[逆光/坂本真綾 (Fate/Grand Order)](https://music.163.com/#/song?id=1294910588)                             |
 |  再会   |                              [再会/はるまきごはん(初音ミク)](http://music.163.com/api/song/media?id=1474338672)<br>[再会/LiSA Uru(produced by Ayase)](https://music.163.com/#/song?id=1492062605)                              |
 |   光    |                                                 [光/宇多田ヒカル](https://music.163.com/#/song?id=1332238900)<br>[光/久遠たま](https://music.163.com/#/song?id=2002778457)                                                 |
+|   if    |                    [If/無力P(巡音ルカ)](https://music.163.com/#/song?id=860066)<br>[if.../DA PUMP](https://music.163.com/#/song?id=461708284)<br>[if/西野カナ](https://music.163.com/#/song?id=625623)                    |
+|    M    |                                               [M/Princess Princess](https://music.163.com/#/song?id=26129953)<br>[M/浜崎あゆみ](https://music.163.com/#/song?id=22737954)                                                |
+|  告白   |                                                [告白/supercell](https://music.163.com/#/song?id=825319)<br>[告白/カンザキイオリ](https://music.163.com/#/song?id=1361159327)                                                 |
 
 ## 特殊狀況
 
