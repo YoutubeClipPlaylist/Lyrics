@@ -18,22 +18,40 @@
 由於歌詞是以曲名做匹配搜尋，因此在同名歌曲上會出錯\
 此表格記錄目前專案內發現的同名歌曲
 
-|  曲目   |                                                                                                         說明                                                                                                          |
-|:-------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-|   you   |                         [You/雪野五月](https://music.163.com/#/song?id=672188)<br> [you/癒月](https://music.163.com/#/song?id=33579507)<br> [YOU/YUI](https://music.163.com/#/song?id=668376)                         |
-| Realize |                                              [Realize/鈴木このみ](https://music.163.com/#/song?id=1474120993)<br>[Realize!/i☆Ris](https://music.163.com/#/song?id=31062384)                                              |
-|  オレンジ   | [オレンジ/流田Project(釘宮理恵,堀江由衣,喜多村英梨)](https://music.163.com/#/song?id=448741128)<br> [オレンジ/7!!](https://music.163.com/#/song?id=458725210)<br>[オレンジ/トーマ(初音ミク)](https://music.163.com/#/song?id=26310273) |
-|  S・K・Y  |                                              [S・K・Y/ライブP(鏡音リン)](https://music.163.com/#/song?id=1398679779)<br>[S•K•Y/さかな](https://music.163.com/#/song?id=1376649008)                                              |
-|  WILL   |                                               [WILL/米倉千尋](https://music.163.com/#/song?id=669130)<br>[WILL/TRUE](http://music.163.com/api/song/media?id=1479561919)                                               |
-|  orion  |              [orion/米津玄師](https://music.163.com/#/song?id=512377169)<br>[ORION/中島美嘉](https://music.163.com/#/song?id=624335)<br>[Orion/オゾン(初音ミク)](https://music.163.com/#/song?id=1467929478)               |
-|  UNION  |                                      [UNION!!/765 MILLION ALLSTARS](http://music.163.com/api/song/media?id=865868058)<br>[UNION/OxT](https://music.163.com/#/song?id=1337263056)                                      |
-|  恋文   |                                        [恋文/やなぎなぎ (Rewrite)](https://music.163.com/#/song?id=26131698)<br>[恋文/Every Little Thing](https://music.163.com/#/song?id=22709795)                                        |
-|  逆光   |                             [逆光/Ado (ONE PIECE FILM RED)](https://music.163.com/#/song?id=1961617004)<br>[逆光/坂本真綾 (Fate/Grand Order)](https://music.163.com/#/song?id=1294910588)                             |
-|  再会   |                              [再会/はるまきごはん(初音ミク)](http://music.163.com/api/song/media?id=1474338672)<br>[再会/LiSA Uru(produced by Ayase)](https://music.163.com/#/song?id=1492062605)                              |
-|   光    |                                                 [光/宇多田ヒカル](https://music.163.com/#/song?id=1332238900)<br>[光/久遠たま](https://music.163.com/#/song?id=2002778457)                                                 |
-|   if    |                    [If/無力P(巡音ルカ)](https://music.163.com/#/song?id=860066)<br>[if.../DA PUMP](https://music.163.com/#/song?id=461708284)<br>[if/西野カナ](https://music.163.com/#/song?id=625623)                    |
-|    M    |                                               [M/Princess Princess](https://music.163.com/#/song?id=26129953)<br>[M/浜崎あゆみ](https://music.163.com/#/song?id=22737954)                                                |
-|  告白   |                                                [告白/supercell](https://music.163.com/#/song?id=825319)<br>[告白/カンザキイオリ](https://music.163.com/#/song?id=1361159327)                                                 |
+|   曲目   |                   歌手                    |     ID     |
+|:--------:|:-----------------------------------------:|:----------:|
+|   You    |                 雪野五月                  |   672188   |
+|   you    |                   癒月                    |  33579507  |
+|   YOU    |                    YUI                    |   668376   |
+| Realize  |                  鈴木このみ                  | 1474120993 |
+| Realize! |                   i☆Ris                   |  31062384  |
+|   オレンジ   | 流田Project(釘宮理恵,堀江由衣,喜多村英梨) | 448741128  |
+|   オレンジ   |                    7!!                    | 458725210  |
+|   オレンジ   |                トーマ(初音ミク)                | 26310273)  |
+|  S・K・Y   |               ライブP(鏡音リン)                | 1398679779 |
+|  S•K•Y   |                    さかな                    | 1376649008 |
+|   WILL   |                 米倉千尋                  |   669130   |
+|   WILL   |                   TRUE                    | 1479561919 |
+|  orion   |                 米津玄師                  | 512377169  |
+|  ORION   |                 中島美嘉                  |   624335   |
+|  Orion   |                オゾン(初音ミク)                | 1467929478 |
+| UNION!!  |           765 MILLION ALLSTARS            | 865868058  |
+|  UNION   |                    OxT                    | 1337263056 |
+|   恋文   |              やなぎなぎ (Rewrite)              |  26131698  |
+|   恋文   |            Every Little Thing             |  22709795  |
+|   逆光   |         Ado (ONE PIECE FILM RED)          | 1961617004 |
+|   逆光   |        坂本真綾 (Fate Grand Order)        | 1294910588 |
+|   再会   |              はるまきごはん(初音ミク)              | 1474338672 |
+|   再会   |        LiSA Uru(produced by Ayase)        | 1492062605 |
+|    光    |                 宇多田ヒカル                 | 1332238900 |
+|    光    |                  久遠たま                   | 2002778457 |
+|    If    |               無力P(巡音ルカ)               |   860066   |
+|  if...   |                  DA PUMP                  | 461708284  |
+|    if    |                  西野カナ                   |   625623   |
+|    M     |             Princess Princess             |  26129953  |
+|    M     |                  浜崎あゆみ                  |  22737954  |
+|   告白   |                 supercell                 |   825319   |
+|   告白   |                  カンザキイオリ                  | 1361159327 |
 
 ## 特殊狀況
 
