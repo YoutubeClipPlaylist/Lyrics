@@ -14,6 +14,7 @@ internal partial class Program
         Startup.Configure(out int MAX_COUNT,
                           out bool _RETRY_FAILED_LYRICS,
                           out List<(string VideoId, int StartTime)> excludeSongs,
+                          out List<string> excludeTitles,
                           out List<ILyric> lyricsFromENV);
         RETRY_FAILED_LYRICS = _RETRY_FAILED_LYRICS;
 
@@ -22,6 +23,7 @@ internal partial class Program
             await ReadJsonFilesAsync();
             ProcessLyricsFromENV(lyricsFromENV);
             RemoveExcludeSongs(excludeSongs);
+            RemoveSongsContainSpecifiedTitle(excludeTitles);
             RemoveLyricsNotContainsInSongs();
             RemoveDuplicatesLyrics();
 

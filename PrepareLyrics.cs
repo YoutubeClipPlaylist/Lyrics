@@ -89,6 +89,13 @@ internal partial class Program
         Console.WriteLine($"Exclude {count} songs from exclude list.");
     }
 
+    static void RemoveSongsContainSpecifiedTitle(List<string> excludeTitles)
+    {
+        var count = Songs.RemoveAll(p => excludeTitles.Where(p1 => p.Title.Contains(p1, StringComparison.OrdinalIgnoreCase))
+                                                      .Any());
+        Console.WriteLine($"Exclude {count} songs from specified title.");
+    }
+
     static void RemoveLyricsNotContainsInSongs()
     {
         var songsHashSet = Songs.Select(p => (p.VideoId, p.StartTime))

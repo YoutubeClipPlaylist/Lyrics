@@ -11,6 +11,7 @@ public static class Startup
     public static void Configure(out int MAX_COUNT,
                                  out bool RETRY_FAILED_LYRICS,
                                  out List<(string, int)> excludeSongs,
+                                 out List<string> excludeTitles,
                                  out List<ILyric> lyricsFromENV)
     {
         IOptions option = PrepareOptions();
@@ -28,6 +29,8 @@ public static class Startup
                                            .Concat(option.ExcludeVideos.Where(p => p.StartTimes.Length == 0)
                                                                        .Select(p => (p.VideoId, -1)))
                                            .ToList();
+
+        excludeTitles = option.ExcludeTitles.ToList();
 
         string? lyricString = Environment.GetEnvironmentVariable("LYRICS");
         lyricsFromENV = new();
