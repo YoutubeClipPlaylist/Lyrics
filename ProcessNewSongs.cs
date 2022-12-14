@@ -13,7 +13,7 @@ internal partial class Program
         for (int i = 0; i < diffList.Count; i++)
         {
             ISong? song = diffList[i];
-            song.Title = Regex.Replace(song.Title, @"[「【\(\[].*[」】\]\)]", "")
+            song.Title = Regex.Replace(song.Title, @"[（「【\(\[].*[）」】\]\)]", "")
                               .Split('/')[0]
                               .Split('／')[0]
                               .Trim();
