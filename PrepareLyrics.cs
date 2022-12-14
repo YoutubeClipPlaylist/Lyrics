@@ -96,12 +96,25 @@ internal partial class Program
         Console.WriteLine($"Exclude {count} songs from specified title.");
     }
 
-    static void RemoveLyricsNotContainsInSongs()
+    static List<ILyric>  RemoveLyricsNotContainsInSongs()
     {
         var songsHashSet = Songs.Select(p => (p.VideoId, p.StartTime))
                                 .ToHashSet();
-        var count = Lyrics.RemoveAll(p => !songsHashSet.Contains((p.VideoId, p.StartTime)));
-        Console.WriteLine($"Remove {count} lyrics because of not contains in playlists.");
+
+        var removed = new List<ILyric>();
+        for (int i = 0; i < Lyrics.Count; i++)
+        {
+            ILyric lyric = Lyrics[i];
+            if (!songsHashSet.Contains((lyric.VideoId, lyric.StartTime)))
+            {
+                removed.Add(Lyrics[i]);
+                Lyrics.RemoveAt(i);
+                i--;
+            }
+        }
+
+        Console.WriteLine($"Remove {removed.Count} lyrics because of not contains in playlists.");
+        return removed;
     }
 
     /// <summary>

@@ -24,8 +24,10 @@ internal partial class Program
             ProcessLyricsFromENV(lyricsFromENV);
             RemoveExcludeSongs(excludeSongs);
             RemoveSongsContainSpecifiedTitle(excludeTitles);
-            RemoveLyricsNotContainsInSongs();
-            List<ILyric> removedDuplicate = RemoveDuplicatesLyrics();
+            List<ILyric> removed = RemoveLyricsNotContainsInSongs()
+                                    .Concat(
+                                       RemoveDuplicatesLyrics()
+                                    ).ToList();
 
             List<ISong> diffList = FilterNewSongs();
 
@@ -38,7 +40,7 @@ internal partial class Program
 
             CloudMusicApi api = new();
             await CheckOldSongs(api);
-            await ProcessNewSongs(api, diffList, removedDuplicate);
+            await ProcessNewSongs(api, diffList, removed);
         }
         catch (Exception e)
         {
