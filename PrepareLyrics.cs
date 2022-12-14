@@ -108,10 +108,10 @@ internal partial class Program
     /// Remove duplicate lyrics based on VideoId and StartTime. The first one will be used if duplicates.
     /// </summary>
     /// <returns></returns>
-    public static void RemoveDuplicatesLyrics()
+    public static List<ILyric> RemoveDuplicatesLyrics()
     {
         var set = new HashSet<(string, int)>();
-        int count = 0;
+        var removed = new List<ILyric>();
         for (int i = 0; i < Lyrics.Count; i++)
         {
             ILyric lyric = Lyrics[i];
@@ -121,13 +121,14 @@ internal partial class Program
             }
             else
             {
+                removed.Add(Lyrics[i]);
                 Lyrics.RemoveAt(i);
                 i--;
-                count++;
             }
         }
-        Console.WriteLine($"Remove {count} lyrics because of duplicates.");
+        Console.WriteLine($"Remove {removed.Count} lyrics because of duplicates.");
         Console.WriteLine($"Finally get {Lyrics.Count} lyrics.");
+        return removed;
     }
 
 }

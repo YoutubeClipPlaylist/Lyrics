@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 internal partial class Program
 {
-    static async Task ProcessNewSongs(CloudMusicApi api, List<ISong> diffList)
+    static async Task ProcessNewSongs(CloudMusicApi api, List<ISong> diffList, List<ILyric> removedDuplicate)
     {
         Random random = new();
         HashSet<int> failedIds = new();
@@ -25,7 +25,9 @@ internal partial class Program
                 string songName = string.Empty;
 
                 // Find lyric id at local.
-                ILyric? existLyric = Lyrics.Find(p => p.Title.ToLower() == song.Title.ToLower());
+                ILyric? existLyric = removedDuplicate.Find(p => p.Title.ToLower() == song.Title.ToLower())
+                                     ?? Lyrics.Find(p => p.Title.ToLower() == song.Title.ToLower());
+
                 if (null != existLyric)
                 {
                     (songId, songName) = (existLyric.LyricId, existLyric.Title);
