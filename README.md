@@ -70,6 +70,7 @@
 |       拝啓ドッペルゲンガー       |                                  [原曲](https://music.163.com/#/song?id=484058936)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/#/song?id=524152940)                                  |
 | アメフラシの歌～Beautiful Rain～ |                                  [原曲](https://music.163.com/#/song?id=28528452)的歌詞是錯誤的，使用此[正確歌詞](https://music.163.com/#/song?id=1374105336)                                  |
 |      運命のルーレット廻して      |                                        [原曲](https://music.163.com/#/song?id=677555)沒有歌詞，使用此[歌詞](https://music.163.com/#/song?id=1498982330)                                        |
+|        happy bite        |                                                                                         歌詞全部錯誤                                                                                          |
 
 ## LICENSE
 
