@@ -1,20 +1,25 @@
 ﻿using Lyrics.Models;
+using Lyrics.Processor;
 using Microsoft.Extensions.Configuration;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Unicode;
 
 namespace Lyrics;
 
 public static class Startup
 {
+    static void ProcessExit(object? sender, EventArgs e)
+        => JsonFileProcessor.WriteLyrics();
+
     public static void Configure(out int MAX_COUNT,
                                  out bool RETRY_FAILED_LYRICS,
                                  out List<(string, int)> excludeSongs,
                                  out List<string> excludeTitles,
                                  out List<ILyric> lyricsFromENV)
     {
-        IOptions option = PrepareOptions();
+        AppDomain.CurrentDomain.ProcessExit += ProcessExit;
+        Console.CancelKeyPress += ProcessExit;
+
+        IOptions option = ReadOptions();
 
         if (!int.TryParse(Environment.GetEnvironmentVariable("MAX_COUNT"), out MAX_COUNT))
         {
@@ -41,13 +46,17 @@ public static class Startup
                 lyricsFromENV = JsonSerializer.Deserialize<List<ILyric>>(lyricString) ?? new();
                 Console.WriteLine($"Get {lyricsFromENV.Count} lyrics from ENV.");
             }
-            catch (JsonException)
+            catch (Exception e)
             {
-                Console.WriteLine("Failed to parse lyric json from ENV.");
-            }
-            catch (NotSupportedException)
-            {
-                Console.WriteLine("Failed to parse lyric json from ENV.");
+                switch (e)
+                {
+                    case JsonException:
+                    case NotSupportedException:
+                        Console.Error.WriteLine("Failed to parse lyric json from ENV.");
+                        break;
+                    default:
+                        throw;
+                }
             }
         }
 
@@ -56,30 +65,10 @@ public static class Startup
         Directory.CreateDirectory("Playlists");
         File.Create("Lyrics/0.lrc").Close();
 #endif
-
-        AppDomain.CurrentDomain.ProcessExit += ProcessExit;
-        Console.CancelKeyPress += ProcessExit;
     }
 
-    static void ProcessExit(object? sender, EventArgs e)
+    private static IOptions ReadOptions()
     {
-        Console.WriteLine("Writing Lyrics.json...");
-        File.WriteAllText(
-            "Lyrics.json",
-            JsonSerializer.Serialize(
-                Program.Lyrics.ToArray(),
-                options: new()
-                {
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                    WriteIndented = true,
-                }),
-            System.Text.Encoding.UTF8);
-        Console.WriteLine("Gracefully exit.");
-    }
-
-    public static IOptions PrepareOptions()
-    {
-        IOptions option = new Options();
         try
         {
             IConfiguration configuration = new ConfigurationBuilder()
@@ -90,21 +79,21 @@ public static class Startup
                 .AddEnvironmentVariables()
                 .Build();
 
-            option = configuration.Get<Options>();
+            IOptions option = configuration.Get<Options>();
             if (null == option
                 || null == option.ExcludeVideos)
             {
                 throw new ApplicationException("Settings file is not valid.");
             }
             Console.WriteLine($"Get {option.ExcludeVideos.Length} exclude videos.");
+            return option;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
-            Console.WriteLine("ERROR_BAD_CONFIGURATION");
+            Console.Error.WriteLine(e.Message);
+            Console.Error.WriteLine("ERROR_BAD_CONFIGURATION");
             Environment.Exit(1610); // ERROR_BAD_CONFIGURATION
+            return default;
         }
-
-        return option;
     }
 }

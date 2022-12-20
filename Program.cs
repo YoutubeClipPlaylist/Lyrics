@@ -1,15 +1,19 @@
 ﻿using Lyrics;
+using Lyrics.Downloader;
 using Lyrics.Models;
+using Lyrics.Processor;
 using NeteaseCloudMusicApi;
 
 internal partial class Program
 {
-    public static readonly List<ILyric> Lyrics = new();
-    public static readonly List<ISong> Songs = new();
+    private static List<ILyric> _lyrics = new();
+    private static List<ISong> _songs = new();
 
-    public static bool RETRY_FAILED_LYRICS { get; set; }
+    public static bool RETRY_FAILED_LYRICS { get; private set; }
 
-    private static async Task Main()
+    public static List<ILyric> Lyrics => _lyrics;
+
+    public static async Task Main()
     {
         Startup.Configure(out int MAX_COUNT,
                           out bool _RETRY_FAILED_LYRICS,
@@ -20,16 +24,19 @@ internal partial class Program
 
         try
         {
-            await ReadJsonFilesAsync();
-            ProcessLyricsFromENV(lyricsFromENV);
-            RemoveExcludeSongs(excludeSongs);
-            RemoveSongsContainSpecifiedTitle(excludeTitles);
-            List<ILyric> removed = RemoveLyricsNotContainsInSongs()
-                                    .Concat(
-                                       RemoveDuplicatesLyrics()
-                                    ).ToList();
+            (_songs, _lyrics) = await new JsonFileProcessor().ReadJsonFilesAsync();
 
-            List<ISong> diffList = FilterNewSongs();
+            LyricsProcessor lyricsProcessor = new(ref _songs, ref _lyrics);
+            lyricsProcessor.ProcessLyricsFromENV(lyricsFromENV);
+            lyricsProcessor.RemoveExcludeSongs(excludeSongs);
+            lyricsProcessor.RemoveSongsContainSpecifiedTitle(excludeTitles);
+            List<ILyric> removed = lyricsProcessor.RemoveLyricsNotContainsInSongs()
+                                                  .Concat(
+                                                     lyricsProcessor.RemoveDuplicatesLyrics()
+                                                  ).ToList();
+
+            List<ISong> diffList = lyricsProcessor.FilterNewSongs();
+            Console.WriteLine($"Get {diffList.Count} new songs.");
 
             if (diffList.Count > MAX_COUNT)
             {
@@ -39,30 +46,25 @@ internal partial class Program
             }
 
             CloudMusicApi api = new();
-            await CheckOldSongs(api);
-            await ProcessNewSongs(api, diffList, removed);
+            LyricsDownloader lyricsDownloader = new(api);
+
+            OldSongProcessor oldSongProcessor = new(lyricsDownloader, ref _lyrics);
+            await oldSongProcessor.ProcessOldSongs();
+
+            NewSongProcessor newSongProcessor = new(lyricsDownloader, ref _lyrics);
+            await newSongProcessor.ProcessNewSongs(diffList, removed);
+
+            // Lyrics.json is written when the program exits.
         }
         catch (Exception e)
         {
-            Console.WriteLine("Unhandled exception: " + e.Message);
-            Console.WriteLine(e.StackTrace);
+            Console.Error.WriteLine("Unhandled exception: " + e.Message);
+            Console.Error.WriteLine(e.StackTrace);
             Environment.Exit(-1);
         }
         finally
         {
             Environment.Exit(0);
         }
-    }
-
-    /// <summary>
-    /// Filter out new songs that are not included in the lyrics.
-    /// </summary>
-    /// <returns></returns>
-    static List<ISong> FilterNewSongs()
-    {
-        if (RETRY_FAILED_LYRICS) Lyrics.RemoveAll(p => p.LyricId < 0);
-
-        HashSet<string> lyricsHashSet = new(Lyrics.Select(p => p.VideoId + p.StartTime));
-        return Songs.Where(p => !lyricsHashSet.Contains(p.VideoId + p.StartTime)).ToList();
     }
 }

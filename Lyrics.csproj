@@ -8,12 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Playlists\AutoGenerator\AutoGenerator\**" />
-    <Compile Remove="Playlists\QuonTama\CreateRadioQTamaSubtitles\**" />
-    <EmbeddedResource Remove="Playlists\AutoGenerator\AutoGenerator\**" />
-    <EmbeddedResource Remove="Playlists\QuonTama\CreateRadioQTamaSubtitles\**" />
-    <None Remove="Playlists\AutoGenerator\AutoGenerator\**" />
-    <None Remove="Playlists\QuonTama\CreateRadioQTamaSubtitles\**" />
+    <Compile Remove="Playlists\**" />
+    <EmbeddedResource Remove="Playlists\**" />
+    <None Remove="Playlists\**" />
   </ItemGroup>
 
   <ItemGroup>
