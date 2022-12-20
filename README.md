@@ -1,7 +1,7 @@
 # Lyrics Repo
 
-![LICENSE](https://img.shields.io/github/license/jim60105/Lyrics?style=for-the-badge)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/jim60105/Lyrics/Fetch%20Lyrics?style=for-the-badge)
+![LICENSE](https://img.shields.io/github/license/YoutubeClipPlaylist/Lyrics?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/YoutubeClipPlaylist/Lyrics/FetchLyrics.yml?branch=master&style=for-the-badge)
 
 ## 特殊 SongId
 
