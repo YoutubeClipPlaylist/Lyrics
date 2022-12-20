@@ -2,7 +2,6 @@
 using Lyrics.Downloader;
 using Lyrics.Models;
 using Lyrics.Processor;
-using NeteaseCloudMusicApi;
 
 internal partial class Program
 {
@@ -26,7 +25,9 @@ internal partial class Program
         {
             (_songs, _lyrics) = await new JsonFileProcessor().ReadJsonFilesAsync();
 
-            LyricsProcessor lyricsProcessor = new(ref _songs, ref _lyrics);
+            LyricsDownloader lyricsDownloader = new(new());
+
+            LyricsProcessor lyricsProcessor = new(lyricsDownloader, ref _songs, ref _lyrics);
             lyricsProcessor.ProcessLyricsFromENV(lyricsFromENV);
             lyricsProcessor.RemoveExcludeSongs(excludeSongs);
             lyricsProcessor.RemoveSongsContainSpecifiedTitle(excludeTitles);
@@ -45,15 +46,13 @@ internal partial class Program
                 diffList = diffList.Take(MAX_COUNT).ToList();
             }
 
-            CloudMusicApi api = new();
-            LyricsDownloader lyricsDownloader = new(api);
+            SongProcessor songProcessor = new(lyricsDownloader, ref _lyrics);
+            await songProcessor.ProcessNewSongs(diffList, removed);
 
-            OldSongProcessor oldSongProcessor = new(lyricsDownloader, ref _lyrics);
-            await oldSongProcessor.ProcessOldSongs();
+            await lyricsProcessor.DownloadMissingLyrics();
+            lyricsProcessor.RemoveLyricsNotInUsed();
 
-            NewSongProcessor newSongProcessor = new(lyricsDownloader, ref _lyrics);
-            await newSongProcessor.ProcessNewSongs(diffList, removed);
-
+            Console.WriteLine($"Exist files count: {new DirectoryInfo("Lyrics").GetFiles().Length}");
             // Lyrics.json is written when the program exits.
         }
         catch (Exception e)

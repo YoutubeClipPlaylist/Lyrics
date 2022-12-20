@@ -14,9 +14,9 @@ public class LyricsDownloader
         _cloudMusicApi = cloudMusicApi;
     }
 
-    public async Task DownloadLyricAndWriteFileAsync(int songId)
+    public async Task<bool> DownloadLyricAndWriteFileAsync(int songId)
     {
-        if (songId <= 0)
+        if (songId < 0)
         {
             throw new ArgumentException("SongId invalid.", nameof(songId));
         }
@@ -25,7 +25,7 @@ public class LyricsDownloader
         if (File.Exists($"Lyrics/{songId}.lrc"))
         {
             Console.WriteLine($"Lyric file {songId}.lrc already exists.");
-            return;
+            return true;
         }
 
         await Task.Delay(TimeSpan.FromMilliseconds(new Random().Next(500, 1500)));
@@ -35,7 +35,8 @@ public class LyricsDownloader
 
         if (string.IsNullOrEmpty(lyricString))
         {
-            throw new Exception("Can't find lyric.");
+            Console.Error.WriteLine("Can't find lyric.");
+            return false;
         }
 
         if (lyricString.Contains("纯音乐，请欣赏")
@@ -44,11 +45,13 @@ public class LyricsDownloader
             // 小於6行
             || lyricString.Split('\n').Length < 6)
         {
-            throw new Exception("Found an invalid lyric.");
+            Console.Error.WriteLine("Found an invalid lyric.");
+            return false;
         }
 
         await File.WriteAllTextAsync($"Lyrics/{songId}.lrc", lyricString, System.Text.Encoding.UTF8);
         Console.WriteLine($"Write new lyric file {songId}.lrc.");
+        return true;
     }
 
     public async Task<(int songId, string songName)> GetSongIdAsync(ISong song, int offset = 0)
@@ -68,13 +71,13 @@ public class LyricsDownloader
         if (!isOk || null == json)
         {
             Console.Error.WriteLine($"API response ${json?["code"] ?? "error"} while getting song id.");
-            return default;
+            return (0, string.Empty);
         }
 
         json = (JObject)json["result"];
         return null == json
                || json["songs"] is not IEnumerable<JToken> result
-               ? default
+               ? (0, string.Empty)
                : result.Select(t => ((int)t["id"], (string)t["name"]))
                        .FirstOrDefault();
     }

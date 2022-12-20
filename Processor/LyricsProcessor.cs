@@ -1,19 +1,26 @@
-﻿using Lyrics.Models;
+﻿using Lyrics.Downloader;
+using Lyrics.Models;
 
 namespace Lyrics.Processor;
 
 internal class LyricsProcessor
 {
+    private readonly LyricsDownloader _lyricsDownloader;
     private readonly List<ISong> _songs;
     private readonly List<ILyric> _lyrics;
+    private readonly HashSet<string> _existsFiles;
 
-    public LyricsProcessor(ref List<ISong> songs, ref List<ILyric> lyrics)
+    public LyricsProcessor(LyricsDownloader lyricsDownloader, ref List<ISong> songs, ref List<ILyric> lyrics)
     {
+        _lyricsDownloader = lyricsDownloader;
         _songs = songs;
         _lyrics = lyrics;
+        _existsFiles = new DirectoryInfo("Lyrics").GetFiles()
+                                                  .Select(p => p.Name)
+                                                  .ToHashSet();
     }
 
-    public void ProcessLyricsFromENV(List<ILyric> lyricFromENV)
+    internal void ProcessLyricsFromENV(List<ILyric> lyricFromENV)
     {
         foreach (var item in lyricFromENV)
         {
@@ -27,7 +34,7 @@ internal class LyricsProcessor
         }
     }
 
-    public void RemoveExcludeSongs(List<(string VideoId, int StartTime)> excludeSongs)
+    internal void RemoveExcludeSongs(List<(string VideoId, int StartTime)> excludeSongs)
     {
         var hashSet = excludeSongs.ToHashSet();
         var count = _songs.RemoveAll(p => hashSet.Contains((p.VideoId, p.StartTime)));
@@ -38,14 +45,14 @@ internal class LyricsProcessor
         Console.WriteLine($"Exclude {count} songs from exclude list.");
     }
 
-    public void RemoveSongsContainSpecifiedTitle(List<string> excludeTitles)
+    internal void RemoveSongsContainSpecifiedTitle(List<string> excludeTitles)
     {
         var count = _songs.RemoveAll(p => excludeTitles.Where(p1 => p.Title.Contains(p1, StringComparison.OrdinalIgnoreCase))
                                                        .Any());
         Console.WriteLine($"Exclude {count} songs from specified title.");
     }
 
-    public List<ILyric> RemoveLyricsNotContainsInSongs()
+    internal List<ILyric> RemoveLyricsNotContainsInSongs()
     {
         var songsHashSet = _songs.Select(p => (p.VideoId, p.StartTime))
                                  .ToHashSet();
@@ -70,7 +77,7 @@ internal class LyricsProcessor
     /// Remove duplicate lyrics based on VideoId and StartTime. The first one will be used if duplicates.
     /// </summary>
     /// <returns></returns>
-    public List<ILyric> RemoveDuplicatesLyrics()
+    internal List<ILyric> RemoveDuplicatesLyrics()
     {
         HashSet<(string, int)> set = new();
         List<ILyric> removed = new();
@@ -97,7 +104,7 @@ internal class LyricsProcessor
     /// Filter out new songs that are not included in the lyrics.
     /// </summary>
     /// <returns></returns>
-    public List<ISong> FilterNewSongs()
+    internal List<ISong> FilterNewSongs()
     {
         if (Program.RETRY_FAILED_LYRICS) _lyrics.RemoveAll(p => p.LyricId < 0);
 
@@ -105,5 +112,47 @@ internal class LyricsProcessor
 
         return _songs.Where(p => !lyricsHashSet.Contains(p.VideoId + p.StartTime))
                      .ToList();
+    }
+
+    internal async Task DownloadMissingLyrics()
+    {
+        Console.WriteLine($"Start to download missing lyric files.");
+        HashSet<string> failedFiles = new();
+
+        foreach (var lyric in _lyrics)
+        {
+            if (lyric.LyricId <= 0) continue;
+            var filename = lyric.LyricId + ".lrc";
+
+            if (_existsFiles.Contains(filename)
+                || failedFiles.Contains(filename)) continue;
+
+            if (await _lyricsDownloader.DownloadLyricAndWriteFileAsync(lyric.LyricId))
+            {
+                _existsFiles.Add(filename);
+            }
+            else
+            {
+                Console.Error.WriteLine($"Failed to download lyric {lyric.LyricId}");
+                failedFiles.Add(filename);
+            }
+        }
+    }
+
+    internal void RemoveLyricsNotInUsed()
+    {
+        HashSet<string> usedFiles = _lyrics.Where(p => p.LyricId >= 0)
+                                           .Select(p => p.LyricId + ".lrc")
+                                           .Distinct()
+                                           .ToHashSet();
+
+        foreach (var file in _existsFiles)
+        {
+            if (!usedFiles.Any(p => p == file))
+            {
+                File.Delete(Path.Combine("Lyrics", file));
+                Console.WriteLine($"Delete {file} because it is not in used.");
+            }
+        }
     }
 }
