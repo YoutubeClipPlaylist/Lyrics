@@ -1,7 +1,7 @@
 # Lyrics Repo
 
 ![LICENSE](https://img.shields.io/github/license/YoutubeClipPlaylist/Lyrics?style=for-the-badge)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/YoutubeClipPlaylist/Lyrics/Fetch%20Lyrics?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/YoutubeClipPlaylist/Lyrics/FetchLyrics.yml?branch=master&style=for-the-badge)
 
 此專案是 **[Youtube影片截選播放清單](https://github.com/YoutubeClipPlaylist/YoutubeClipPlaylist)** 專案的 submodule，存放該專案的歌詞。\
 歌詞來源為 [網易雲音樂](https://music.163.com/)，以 Github Workflow 定時將播放清單使用的歌詞轉存至此 Repo 的 [lyrics](https://github.com/YoutubeClipPlaylist/Lyrics/tree/lyrics) 分支，然後再讓客戶端存取此 Github Repo。\
