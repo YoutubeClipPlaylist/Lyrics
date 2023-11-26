@@ -26,7 +26,7 @@ class SongConverter : JsonConverter<ISong>
 {
     public override Song Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        List<JsonElement> dto = JsonSerializer.Deserialize<List<JsonElement>>(ref reader, options) ?? new();
+        List<JsonElement> dto = JsonSerializer.Deserialize<List<JsonElement>>(ref reader, options) ?? [];
         Queue<JsonElement> queue = new(dto);
         Song song = new();
         try

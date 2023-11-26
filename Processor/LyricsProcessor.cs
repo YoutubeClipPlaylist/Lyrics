@@ -57,7 +57,7 @@ internal class LyricsProcessor
         var songsHashSet = _songs.Select(p => (p.VideoId, p.StartTime))
                                  .ToHashSet();
 
-        List<ILyric> removed = new();
+        List<ILyric> removed = [];
         for (int i = 0; i < _lyrics.Count; i++)
         {
             ILyric lyric = _lyrics[i];
@@ -79,8 +79,8 @@ internal class LyricsProcessor
     /// <returns></returns>
     internal List<ILyric> RemoveDuplicatesLyrics()
     {
-        HashSet<(string, int)> set = new();
-        List<ILyric> removed = new();
+        HashSet<(string, int)> set = [];
+        List<ILyric> removed = [];
         for (int i = 0; i < _lyrics.Count; i++)
         {
             ILyric lyric = _lyrics[i];
@@ -117,7 +117,7 @@ internal class LyricsProcessor
     internal async Task DownloadMissingLyrics()
     {
         Console.WriteLine($"Start to download missing lyric files.");
-        HashSet<string> failedFiles = new();
+        HashSet<string> failedFiles = [];
 
         foreach (var lyric in _lyrics)
         {

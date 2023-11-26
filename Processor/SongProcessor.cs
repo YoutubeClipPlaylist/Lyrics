@@ -135,7 +135,7 @@ internal class SongProcessor
     /// <returns>如果成功，songId會是正整數；如果找不到歌曲，songId會是0；如果找到歌曲但是下載失敗，songId會是負數(-songId)</returns>
     private async Task<(int songId, string songName)> FindAndDownloadFromNeteaseCloud(ISong song, int offset = 0, HashSet<int>? failedIds = null)
     {
-        if (null == failedIds) failedIds = new();
+        if (null == failedIds) failedIds = [];
 
         var (songId, songName) = await FindLyricAtNeteaseCloudAsync(song, offset);
 

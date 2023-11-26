@@ -5,8 +5,8 @@ using Lyrics.Processor;
 
 internal partial class Program
 {
-    private static List<ILyric> _lyrics = new();
-    private static List<ISong> _songs = new();
+    private static List<ILyric> _lyrics = [];
+    private static List<ISong> _songs = [];
 
     public static bool RETRY_FAILED_LYRICS { get; private set; }
 
@@ -31,10 +31,10 @@ internal partial class Program
             lyricsProcessor.ProcessLyricsFromENV(lyricsFromENV);
             lyricsProcessor.RemoveExcludeSongs(excludeSongs);
             lyricsProcessor.RemoveSongsContainSpecifiedTitle(excludeTitles);
-            List<ILyric> removed = lyricsProcessor.RemoveLyricsNotContainsInSongs()
-                                                  .Concat(
-                                                     lyricsProcessor.RemoveDuplicatesLyrics()
-                                                  ).ToList();
+            List<ILyric> removed = [
+                .. lyricsProcessor.RemoveLyricsNotContainsInSongs(),
+                .. lyricsProcessor.RemoveDuplicatesLyrics()
+            ];
 
             List<ISong> diffList = lyricsProcessor.FilterNewSongs();
             Console.WriteLine($"Get {diffList.Count} new songs.");

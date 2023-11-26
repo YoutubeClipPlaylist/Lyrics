@@ -37,13 +37,13 @@ namespace Lyrics.Processor
         async Task<List<ISong>> ReadPlaylistsAsync()
         {
             string[] jsoncFiles = Directory.GetFiles("Playlists", "*list.jsonc", SearchOption.AllDirectories);
-            List<ISong> songs = new();
+            List<ISong> songs = [];
             foreach (var file in jsoncFiles)
             {
                 Console.WriteLine($"Reading {file}...");
                 using FileStream fs = File.OpenRead(file);
                 List<ISong> temp = await JsonSerializer.DeserializeAsync<List<ISong>>(fs, _jsonSerializerOptions)
-                                   ?? new();
+                                   ?? [];
                 Console.WriteLine($"Loaded {temp.Count} songs.");
                 songs.AddRange(temp);
             }
@@ -60,14 +60,14 @@ namespace Lyrics.Processor
                 using StreamWriter sw = File.CreateText(path);
                 await sw.WriteLineAsync("[]");
                 Console.WriteLine($"Create {path} because file is not exists.");
-                return new();
+                return [];
             }
 
             Console.WriteLine($"Reading {path}...");
 
             using FileStream fs = File.OpenRead(path);
             List<ILyric> lyrics = await JsonSerializer.DeserializeAsync<List<ILyric>>(fs, _jsonSerializerOptions)
-                                  ?? new();
+                                  ?? [];
             Console.WriteLine($"Loaded {lyrics.Count} lyrics.");
 
             return lyrics;

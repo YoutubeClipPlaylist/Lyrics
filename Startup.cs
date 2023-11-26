@@ -35,15 +35,15 @@ public static class Startup
                                                                        .Select(p => (p.VideoId, -1)))
                                            .ToList();
 
-        excludeTitles = option.ExcludeTitles.ToList();
+        excludeTitles = [.. option.ExcludeTitles];
 
         string? lyricString = Environment.GetEnvironmentVariable("LYRICS");
-        lyricsFromENV = new();
+        lyricsFromENV = [];
         if (!string.IsNullOrEmpty(lyricString))
         {
             try
             {
-                lyricsFromENV = JsonSerializer.Deserialize<List<ILyric>>(lyricString) ?? new();
+                lyricsFromENV = JsonSerializer.Deserialize<List<ILyric>>(lyricString) ?? [];
                 Console.WriteLine($"Get {lyricsFromENV.Count} lyrics from ENV.");
             }
             catch (Exception e)
@@ -79,7 +79,7 @@ public static class Startup
                 .AddEnvironmentVariables()
                 .Build();
 
-            IOptions option = configuration.Get<Options>();
+            IOptions? option = configuration.Get<Options>();
             if (null == option
                 || null == option.ExcludeVideos)
             {
