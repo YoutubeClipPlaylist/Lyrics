@@ -74,8 +74,15 @@
 
 ## LICENSE
 
-lrc歌詞來源為 [網易雲音樂](https://music.163.com/)，歌詞內容版權為原作者和網易雲音樂所有。\
-本專案僅將歌詞轉存至 Github Repo，不會對歌詞內容進行任何修改。\
-本專案程式部份採用 MIT License，詳細內容請參考 [LICENSE](/LICENSE) 檔案。\
-[![LICENSE](https://img.shields.io/github/license/jim60105/Lyrics?style=for-the-badge)
-](/LICENSE)
+> lrc歌詞來源為 [網易雲音樂](https://music.163.com/)，歌詞內容版權為原作者和網易雲音樂所有。  
+> 本專案僅將歌詞轉存至 Github Repo，不會對歌詞內容進行任何修改。
+
+[![AGPL-3.0](https://github.com/YoutubeClipPlaylist/Lyrics/assets/16995691/186d774f-c62b-4f4f-b3cb-0d131b1f96c5)](LICENSE)
+
+[GNU AFFERO GENERAL PUBLIC LICENSE Version 3](LICENSE)
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
