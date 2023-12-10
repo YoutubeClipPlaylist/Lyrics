@@ -21,4 +21,3 @@ public class Lyric : ILyric
     public string Title { get; set; } = "";
     public float Offset { get; set; }
 }
-
