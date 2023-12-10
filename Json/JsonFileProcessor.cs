@@ -46,7 +46,17 @@ internal class JsonFileProcessor
         Justification = $"{nameof(SourceGenerationContext)} is set.")]
     async Task<List<ISong>> ReadPlaylistsAsync()
     {
-        string[] jsoncFiles = Directory.GetFiles("Playlists", "*list.jsonc", SearchOption.AllDirectories);
+        string[] jsoncFiles = Directory.EnumerateFiles(path: "Playlists",
+                                                       searchPattern: "*list.jsonc",
+                                                       enumerationOptions: new()
+                                                       {
+                                                           MatchCasing = MatchCasing.CaseInsensitive,
+                                                           RecurseSubdirectories = true,
+                                                           MaxRecursionDepth = 1,
+                                                           IgnoreInaccessible = true
+                                                       })
+                                       .ToArray();
+
         List<ISong> songs = [];
         foreach (var file in jsoncFiles)
         {
