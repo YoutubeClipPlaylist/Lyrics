@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Lyrics.Processor;
 
-internal class SongProcessor
+internal partial class SongProcessor
 {
     private readonly LyricsDownloader _lyricsDownloader;
     private readonly List<ILyric> _lyrics;
@@ -97,8 +97,8 @@ internal class SongProcessor
     /// <returns>是否成功在本地找到</returns>
     private bool TryFindLyricAtLocal(List<ILyric> removed, ISong song, out int lyricId, out string title)
     {
-        ILyric? existLyric = removed.Find(p => p.Title.ToLower() == song.Title.ToLower())
-                             ?? _lyrics.Find(p => p.Title.ToLower() == song.Title.ToLower())
+        ILyric? existLyric = removed.Find(p => p.Title.Equals(song.Title, StringComparison.InvariantCultureIgnoreCase))
+                             ?? _lyrics.Find(p => p.Title.Equals(song.Title, StringComparison.InvariantCultureIgnoreCase))
                              ?? null;
 
         (lyricId, title) = existLyric == null
@@ -139,7 +139,7 @@ internal class SongProcessor
 
         var (songId, songName) = await FindLyricAtNeteaseCloudAsync(song, offset);
 
-        if (songId == 0 
+        if (songId == 0
             || failedIds.Contains(songId))
         {
             songId = -songId;
@@ -155,8 +155,10 @@ internal class SongProcessor
         return (songId, songName);
     }
 
-    private static string CleanTitle(string name) => Regex.Replace(name, @"[（「【\(\[].*[）」】\]\)]", "")
-                                                          .Split('/')[0]
-                                                          .Split('／')[0]
-                                                          .Trim();
+    private static string CleanTitle(string name) => InBrackets().Replace(name, "")
+                                                                 .Split('/')[0]
+                                                                 .Split('／')[0]
+                                                                 .Trim();
+    [GeneratedRegex(@"[（「【\(\[].*[）」】\]\)]")]
+    private static partial Regex InBrackets();
 }

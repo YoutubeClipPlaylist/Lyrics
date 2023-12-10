@@ -1,7 +1,9 @@
 ﻿using Lyrics;
 using Lyrics.Downloader;
+using Lyrics.Json;
 using Lyrics.Models;
 using Lyrics.Processor;
+using System.Diagnostics.CodeAnalysis;
 
 internal partial class Program
 {
@@ -12,6 +14,7 @@ internal partial class Program
 
     public static List<ILyric> Lyrics => _lyrics;
 
+    [RequiresUnreferencedCode("Calls Lyrics.Downloader.LyricsDownloader.LyricsDownloader(CloudMusicApi)")]
     public static async Task Main()
     {
         Startup.Configure(out int MAX_COUNT,

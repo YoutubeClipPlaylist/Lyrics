@@ -1,18 +1,15 @@
 ﻿using Lyrics.Models;
 using NeteaseCloudMusicApi;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace Lyrics.Downloader;
 
-public class LyricsDownloader
+[RequiresUnreferencedCode("Newtonsoft.Json is used.")]
+public partial class LyricsDownloader(CloudMusicApi cloudMusicApi)
 {
-    private readonly CloudMusicApi _cloudMusicApi;
-
-    public LyricsDownloader(CloudMusicApi cloudMusicApi)
-    {
-        _cloudMusicApi = cloudMusicApi;
-    }
+    private readonly CloudMusicApi _cloudMusicApi = cloudMusicApi;
 
     public async Task<bool> DownloadLyricAndWriteFileAsync(int songId)
     {
@@ -41,7 +38,7 @@ public class LyricsDownloader
 
         if (lyricString.Contains("纯音乐，请欣赏")
             // 沒有時間資訊
-            || !Regex.IsMatch(lyricString, @"\[\d{2}:\d{2}.\d{1,5}\]")
+            || !TimeRegex().IsMatch(lyricString)
             // 小於6行
             || lyricString.Split('\n').Length < 6)
         {
@@ -100,4 +97,6 @@ public class LyricsDownloader
                : null;
     }
 
+    [GeneratedRegex(@"\[\d{2}:\d{2}.\d{1,5}\]")]
+    private static partial Regex TimeRegex();
 }

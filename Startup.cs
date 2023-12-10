@@ -1,6 +1,7 @@
-﻿using Lyrics.Models;
-using Lyrics.Processor;
+﻿using Lyrics.Json;
+using Lyrics.Models;
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace Lyrics;
@@ -10,6 +11,14 @@ public static class Startup
     static void ProcessExit(object? sender, EventArgs e)
         => JsonFileProcessor.WriteLyrics();
 
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = $"{nameof(SourceGenerationContext)} is set.")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = $"{nameof(SourceGenerationContext)} is set.")]
     public static void Configure(out int MAX_COUNT,
                                  out bool RETRY_FAILED_LYRICS,
                                  out List<(string, int)> excludeSongs,

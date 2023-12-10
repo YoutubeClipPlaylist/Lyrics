@@ -2,14 +2,14 @@
 
 public interface IOptions
 {
-    public IExcludeVideo[] ExcludeVideos { get; set; }
+    public ExcludeVideo[] ExcludeVideos { get; set; }
     public string[] ExcludeTitles { get; set; }
 }
 
 public class Options : IOptions
 {
-    public IExcludeVideo[] ExcludeVideos { get; set; } = Array.Empty<ExcludeVideo>();
-    public string[] ExcludeTitles { get; set; } = Array.Empty<string>();
+    public ExcludeVideo[] ExcludeVideos { get; set; } = [];
+    public string[] ExcludeTitles { get; set; } = [];
 }
 
 public interface IExcludeVideo
@@ -22,5 +22,5 @@ public class ExcludeVideo : IExcludeVideo
 {
 
     public string VideoId { get; set; } = "";
-    public int[] StartTimes { get; set; } = Array.Empty<int>();
+    public int[] StartTimes { get; set; } = [];
 }
