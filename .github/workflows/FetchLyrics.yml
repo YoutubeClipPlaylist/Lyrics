@@ -27,67 +27,41 @@ on:
     types: [fetch_lyrics]
 
 jobs:
-  build:
-    runs-on: windows-latest # dotnet SDK built-in
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: master
-
-      - run: dotnet publish /p:Configuration=Release /p:PublishProfile=FolderProfile
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: artifact
-          path: bin/Release/net8.0/publish/win-x64
-          retention-days: 7
-
   Fetch_Lyrics:
-    runs-on: windows-latest # dotnet SDK built-in
-    needs: build
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: lyrics
 
       - name: Checkout submodules to latest
         run: git submodule update --init --recursive && git submodule update --recursive --remote
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: artifact
-
       - name: Checkout appsettings.json from HEAD
         run: 'git checkout HEAD appsettings.json'
 
-      - name: Execute Lyrics.exe (workflow_dispatch)
+      - name: Execute Lyrics (workflow_dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        shell: cmd
         env:
           RETRY_FAILED_LYRICS: ${{ github.event.inputs.retry_failed_lyrics }}
           MAX_COUNT: ${{ github.event.inputs.max_count }}
           LYRICS: ${{ github.event.inputs.lyrics }}
-        run: 'call Lyrics.exe'
+        run: 'chmod -R a+w Lyrics && docker run -v .:/output -v $PWD/appsettings.json:/app/appsettings.json ghcr.io/youtubeclipplaylist/lyrics'
 
-      - name: Execute Lyrics.exe (repository_dispatch)
+      - name: Execute Lyrics (repository_dispatch)
         if: ${{ github.event_name == 'repository_dispatch' }}
-        shell: cmd
         env:
           RETRY_FAILED_LYRICS: ${{ github.event.client_payload.retry_failed_lyrics }}
           MAX_COUNT: ${{ github.event.client_payload.max_count }}
           LYRICS: ${{ github.event.client_payload.lyrics }}
-        run: 'call Lyrics.exe'
+        run: 'chmod -R a+w Lyrics && docker run -v .:/output -v $PWD/appsettings.json:/app/appsettings.json ghcr.io/youtubeclipplaylist/lyrics'
 
-      - name: Execute Lyrics.exe (schedule, push)
+      - name: Execute Lyrics (schedule, push)
         if: ${{ github.event_name == 'schedule' || github.event_name == 'push' }}
-        shell: cmd
-        run: 'call Lyrics.exe'
+        run: 'chmod -R a+w Lyrics && docker run -v .:/output -v $PWD/appsettings.json:/app/appsettings.json ghcr.io/youtubeclipplaylist/lyrics'
 
       - name: Git Auto Commit
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: lyrics
           file_pattern: Lyrics Lyrics.json
