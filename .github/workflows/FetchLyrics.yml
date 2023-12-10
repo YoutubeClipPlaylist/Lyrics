@@ -46,7 +46,11 @@ jobs:
           RETRY_FAILED_LYRICS: ${{ github.event.inputs.retry_failed_lyrics }}
           MAX_COUNT: ${{ github.event.inputs.max_count }}
           LYRICS: ${{ github.event.inputs.lyrics }}
-        run: 'chmod -R a+w Lyrics && docker run -v .:/output -v $PWD/appsettings.json:/app/appsettings.json ghcr.io/youtubeclipplaylist/lyrics'
+        run: |
+          chmod -R a+w Lyrics
+          chmod a+w Lyrics.json
+          chmod -R a+r Playlists
+          docker run -v .:/output -v $PWD/appsettings.json:/app/appsettings.json ghcr.io/youtubeclipplaylist/lyrics
 
       - name: Execute Lyrics (repository_dispatch)
         if: ${{ github.event_name == 'repository_dispatch' }}
@@ -54,11 +58,19 @@ jobs:
           RETRY_FAILED_LYRICS: ${{ github.event.client_payload.retry_failed_lyrics }}
           MAX_COUNT: ${{ github.event.client_payload.max_count }}
           LYRICS: ${{ github.event.client_payload.lyrics }}
-        run: 'chmod -R a+w Lyrics && docker run -v .:/output -v $PWD/appsettings.json:/app/appsettings.json ghcr.io/youtubeclipplaylist/lyrics'
+        run: |
+          chmod -R a+w Lyrics
+          chmod a+w Lyrics.json
+          chmod -R a+r Playlists
+          docker run -v .:/output -v $PWD/appsettings.json:/app/appsettings.json ghcr.io/youtubeclipplaylist/lyrics
 
       - name: Execute Lyrics (schedule, push)
         if: ${{ github.event_name == 'schedule' || github.event_name == 'push' }}
-        run: 'chmod -R a+w Lyrics && docker run -v .:/output -v $PWD/appsettings.json:/app/appsettings.json ghcr.io/youtubeclipplaylist/lyrics'
+        run: |
+          chmod -R a+w Lyrics
+          chmod a+w Lyrics.json
+          chmod -R a+r Playlists
+          docker run -v .:/output -v $PWD/appsettings.json:/app/appsettings.json ghcr.io/youtubeclipplaylist/lyrics
 
       - name: Git Auto Commit
         uses: stefanzweifel/git-auto-commit-action@v5
