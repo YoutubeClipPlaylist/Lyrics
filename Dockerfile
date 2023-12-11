@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/dotnet/runtime:8.0-jammy AS debug
 USER app
 WORKDIR /app
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/nightly/sdk:8.0-jammy-aot AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-jammy AS build
 ARG BUILD_CONFIGURATION=Release
 ARG TARGETARCH
 WORKDIR /src
@@ -17,7 +17,7 @@ ARG BUILD_CONFIGURATION=Release
 COPY . .
 RUN dotnet publish -a $TARGETARCH -c $BUILD_CONFIGURATION -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/nightly/runtime-deps:8.0-jammy-chiseled-aot AS final
+FROM mcr.microsoft.com/dotnet/runtime-deps:8.0-jammy-chiseled AS final
 
 ENV PATH="/app:$PATH"
 

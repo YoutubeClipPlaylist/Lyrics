@@ -15,10 +15,6 @@ public static class Startup
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
         Justification = $"{nameof(SourceGenerationContext)} is set.")]
-    [UnconditionalSuppressMessage(
-        "AOT",
-        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
-        Justification = $"{nameof(SourceGenerationContext)} is set.")]
     public static void Configure(out int MAX_COUNT,
                                  out bool RETRY_FAILED_LYRICS,
                                  out List<(string, int)> excludeSongs,

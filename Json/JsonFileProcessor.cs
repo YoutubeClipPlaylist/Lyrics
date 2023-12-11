@@ -40,10 +40,6 @@ internal class JsonFileProcessor
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
         Justification = $"{nameof(SourceGenerationContext)} is set.")]
-    [UnconditionalSuppressMessage(
-        "AOT",
-        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
-        Justification = $"{nameof(SourceGenerationContext)} is set.")]
     async Task<List<ISong>> ReadPlaylistsAsync()
     {
         string[] jsoncFiles = Directory.EnumerateFiles(path: "Playlists",
@@ -76,10 +72,6 @@ internal class JsonFileProcessor
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
         Justification = $"{nameof(SourceGenerationContext)} is set.")]
-    [UnconditionalSuppressMessage(
-        "AOT",
-        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
-        Justification = $"{nameof(SourceGenerationContext)} is set.")]
     async Task<List<ILyric>> ReadLyricsAsync()
     {
         string path = "Lyrics.json";
@@ -104,10 +96,6 @@ internal class JsonFileProcessor
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
-        Justification = $"{nameof(SourceGenerationContext)} is set.")]
-    [UnconditionalSuppressMessage(
-        "AOT",
-        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
         Justification = $"{nameof(SourceGenerationContext)} is set.")]
     public static void WriteLyrics()
     {

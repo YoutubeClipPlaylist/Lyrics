@@ -5,9 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <PublishAot>true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
-    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
     <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
@@ -36,14 +36,5 @@
     <TrimmerRootAssembly Include="Lyrics" />
     <TrimmerRootAssembly Include="NeteaseCloudMusicApi" />
     <TrimmerRootAssembly Include="Newtonsoft.Json" />
-
-    <PublishReadyToRunExclude Include="Lyrics.dll" />
-    <PublishReadyToRunExclude Include="NeteaseCloudMusicApi.dll" />
-    <PublishReadyToRunExclude Include="Newtonsoft.Json.dll" />
-    <PublishReadyToRunExclude Include="System.Data.Common.dll" />
-    <PublishReadyToRunExclude Include="System.Linq.Expressions.dll" />
-    <PublishReadyToRunExclude Include="Microsoft.CSharp.dll" />
-    <PublishReadyToRunExclude Include="System.Data.Common.dll" />
-    <PublishReadyToRunExclude Include="System.Data.Common.dll" />
   </ItemGroup>
 </Project>
