@@ -8,14 +8,16 @@ namespace Lyrics.Json;
 
 internal class JsonFileProcessor
 {
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         ReadCommentHandling = JsonCommentHandling.Skip,
         AllowTrailingCommas = true,
-        TypeInfoResolver = SourceGenerationContext.Default
+        TypeInfoResolver = SourceGenerationContext.Default,
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+        WriteIndented = true,
     };
 
-    public async Task<(List<ISong> Songs, List<ILyric> Lyrics)> ReadJsonFilesAsync()
+    public static async Task<(List<ISong> Songs, List<ILyric> Lyrics)> ReadJsonFilesAsync()
     {
         try
         {
@@ -40,7 +42,7 @@ internal class JsonFileProcessor
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
         Justification = $"{nameof(SourceGenerationContext)} is set.")]
-    async Task<List<ISong>> ReadPlaylistsAsync()
+    private static async Task<List<ISong>> ReadPlaylistsAsync()
     {
         string[] jsoncFiles = Directory.EnumerateFiles(path: "Playlists",
                                                        searchPattern: "*list.jsonc",
@@ -72,7 +74,7 @@ internal class JsonFileProcessor
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
         Justification = $"{nameof(SourceGenerationContext)} is set.")]
-    async Task<List<ILyric>> ReadLyricsAsync()
+    private static async Task<List<ILyric>> ReadLyricsAsync()
     {
         string path = "Lyrics.json";
         if (!File.Exists(path))
@@ -102,14 +104,7 @@ internal class JsonFileProcessor
         Console.WriteLine("Writing Lyrics.json...");
         File.WriteAllText(
             "Lyrics.json",
-            JsonSerializer.Serialize(
-                Program.Lyrics,
-                options: new()
-                {
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                    WriteIndented = true,
-                    TypeInfoResolver = SourceGenerationContext.Default
-                }),
+            JsonSerializer.Serialize(Program.Lyrics, options: _jsonSerializerOptions),
             System.Text.Encoding.UTF8);
         Console.WriteLine("Gracefully exit.");
     }

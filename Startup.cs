@@ -48,7 +48,10 @@ public static class Startup
         {
             try
             {
-                lyricsFromENV = JsonSerializer.Deserialize<List<ILyric>>(lyricString) ?? [];
+                lyricsFromENV = JsonSerializer.Deserialize<List<ILyric>>(lyricString, options: new()
+                {
+                    TypeInfoResolver = SourceGenerationContext.Default
+                }) ?? [];
                 Console.WriteLine($"Get {lyricsFromENV.Count} lyrics from ENV.");
             }
             catch (Exception e)

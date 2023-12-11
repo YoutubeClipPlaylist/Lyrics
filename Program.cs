@@ -26,7 +26,7 @@ internal partial class Program
 
         try
         {
-            (_songs, _lyrics) = await new JsonFileProcessor().ReadJsonFilesAsync();
+            (_songs, _lyrics) = await JsonFileProcessor.ReadJsonFilesAsync();
 
             LyricsDownloader lyricsDownloader = new(new());
 
