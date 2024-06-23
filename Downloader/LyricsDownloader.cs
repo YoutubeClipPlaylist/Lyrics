@@ -11,7 +11,7 @@ public partial class LyricsDownloader(CloudMusicApi cloudMusicApi)
 {
     private readonly CloudMusicApi _cloudMusicApi = cloudMusicApi;
 
-    public async Task<bool> DownloadLyricAndWriteFileAsync(int songId)
+    public async Task<bool> DownloadLyricAndWriteFileAsync(long songId)
     {
         if (songId < 0)
         {
@@ -51,7 +51,7 @@ public partial class LyricsDownloader(CloudMusicApi cloudMusicApi)
         return true;
     }
 
-    public async Task<(int songId, string songName)> GetSongIdAsync(ISong song, int offset = 0)
+    public async Task<(long songId, string songName)> GetSongIdAsync(ISong song, int offset = 0)
     {
         if (string.IsNullOrEmpty(song.Title))
         {
@@ -74,12 +74,12 @@ public partial class LyricsDownloader(CloudMusicApi cloudMusicApi)
         json = (JObject)json["result"];
         return null == json
                || json["songs"] is not IEnumerable<JToken> result
-               ? (0, string.Empty)
-               : result.Select(t => ((int)t["id"], (string)t["name"]))
-                       .FirstOrDefault();
+                   ? (0, string.Empty)
+                   : result.Select(t => ((long)t["id"], (string)t["name"]))
+                           .FirstOrDefault();
     }
 
-    public async Task<string?> GetLyricAsync(int songId)
+    public async Task<string?> GetLyricAsync(long songId)
     {
         (bool isOk, JObject json) = await _cloudMusicApi.RequestAsync(CloudMusicApiProviders.Lyric,
                                                                       new Dictionary<string, object> {

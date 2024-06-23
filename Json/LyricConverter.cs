@@ -18,7 +18,7 @@ class LyricConverter : JsonConverter<ILyric>
         {
             lyric.VideoId = queue.Dequeue().GetString() ?? "";
             lyric.StartTime = queue.Dequeue().GetInt32();
-            lyric.LyricId = queue.Dequeue().GetInt32();
+            lyric.LyricId = queue.Dequeue().GetInt64();
             lyric.Title = queue.Dequeue().GetString() ?? "";
             lyric.Offset = queue.Dequeue().GetSingle();
         }

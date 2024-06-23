@@ -18,9 +18,9 @@ internal partial class SongProcessor
     internal async Task ProcessNewSongs(List<ISong> diffList, List<ILyric> removed)
     {
         Random random = new();
-        HashSet<int> failedIds = _lyrics.Where(p => p.LyricId < 0)
-                                        .Select(p => p.LyricId)
-                                        .ToHashSet();
+        HashSet<long> failedIds = _lyrics.Where(p => p.LyricId < 0)
+                                         .Select(p => p.LyricId)
+                                         .ToHashSet();
 
         for (int i = 0; i < diffList.Count; i++)
         {
@@ -31,7 +31,7 @@ internal partial class SongProcessor
 
             try
             {
-                if (TryFindLyricAtLocal(removed, song, out int songId, out string songName))
+                if (TryFindLyricAtLocal(removed, song, out long songId, out string songName))
                 {
                     AddToLyrics(i, song, songId, songName);
                     continue;
@@ -73,7 +73,7 @@ internal partial class SongProcessor
             }
         }
 
-        void AddToLyrics(int i, ISong song, int songId, string songName)
+        void AddToLyrics(int i, ISong song, long songId, string songName)
         {
             _lyrics.Add(new Lyric()
             {
@@ -95,7 +95,7 @@ internal partial class SongProcessor
     /// <param name="song"></param>
     /// <param name="result">result</param>
     /// <returns>是否成功在本地找到</returns>
-    private bool TryFindLyricAtLocal(List<ILyric> removed, ISong song, out int lyricId, out string title)
+    private bool TryFindLyricAtLocal(List<ILyric> removed, ISong song, out long lyricId, out string title)
     {
         ILyric? existLyric = removed.Find(p => p.Title.Equals(song.Title, StringComparison.InvariantCultureIgnoreCase))
                              ?? _lyrics.Find(p => p.Title.Equals(song.Title, StringComparison.InvariantCultureIgnoreCase))
@@ -114,10 +114,10 @@ internal partial class SongProcessor
     /// <param name="song"></param>
     /// <param name="offset"></param>
     /// <returns>如果成功，songId會是正整數；如果失敗，songId會是0</returns>
-    private async Task<(int songId, string songName)> FindLyricAtNeteaseCloudAsync(ISong song, int offset = 0)
+    private async Task<(long songId, string songName)> FindLyricAtNeteaseCloudAsync(ISong song, int offset = 0)
     {
         // Find lyric id at Netease Cloud Music.
-        (int songId, string songName) = await _lyricsDownloader.GetSongIdAsync(song, offset);
+        (long songId, string songName) = await _lyricsDownloader.GetSongIdAsync(song, offset);
 
         // Can't find song from internet.
         if (songId == 0)
@@ -133,7 +133,7 @@ internal partial class SongProcessor
     /// <param name="song"></param>
     /// <param name="offset"></param>
     /// <returns>如果成功，songId會是正整數；如果找不到歌曲，songId會是0；如果找到歌曲但是下載失敗，songId會是負數(-songId)</returns>
-    private async Task<(int songId, string songName)> FindAndDownloadFromNeteaseCloud(ISong song, int offset = 0, HashSet<int>? failedIds = null)
+    private async Task<(long songId, string songName)> FindAndDownloadFromNeteaseCloud(ISong song, int offset = 0, HashSet<long>? failedIds = null)
     {
         if (null == failedIds) failedIds = [];
 
